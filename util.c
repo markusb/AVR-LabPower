@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/pgmspace.h>
 #include "lcd.h"
 
 /*
@@ -23,6 +24,19 @@ void util_clockinit () {
     CCP = CCP_IOREG_gc; //Security Signature to modify clock 
     CLK.CTRL = CLK_SCLKSEL_RC32M_gc; //select sysclock 32MHz osc
 
+}
+
+uint8_t util_read_calib_byte( uint8_t index ) {
+    uint8_t result;
+
+    /* Load the NVM Command register to read the calibration row. */
+    NVM_CMD = NVM_CMD_READ_CALIB_ROW_gc;
+    result = pgm_read_byte(index);
+
+    /* Clean up NVM Command register. */
+    NVM_CMD = NVM_CMD_NO_OPERATION_gc;
+
+    return result;
 }
 
 /************************************

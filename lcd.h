@@ -34,6 +34,7 @@
 void lcd_init ();
 void lcd_setbacklight (int);
 void util_clockinit ();
+void lcd_clearscreen ();
 void lcd_sendcmd (unsigned char);
 void lcd_senddata (unsigned char);
 void lcd_putcxy (unsigned char, unsigned char, unsigned char);
