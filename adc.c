@@ -24,32 +24,29 @@ void adc_init () {
     ADCA.CALH = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, ADCACAL1) );
     // PORTA is all inputs
     PORTA.DIR = 0;
-    PORTA.PIN0CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
-    PORTA.PIN1CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
-    PORTA.PIN2CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
-    PORTA.PIN3CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
-    PORTA.PIN4CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
-    PORTA.PIN5CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
-    PORTA.PIN6CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
-    PORTA.PIN7CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN0CTRL = PORT_ISC_INPUT_DISABLE_gc;
+//    PORTA.PIN1CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+//    PORTA.PIN2CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN3CTRL = PORT_ISC_INPUT_DISABLE_gc;
+    PORTA.PIN4CTRL = PORT_ISC_INPUT_DISABLE_gc;
+    PORTA.PIN5CTRL = PORT_ISC_INPUT_DISABLE_gc;
+    PORTA.PIN6CTRL = PORT_ISC_INPUT_DISABLE_gc;
+    PORTA.PIN7CTRL = PORT_ISC_INPUT_DISABLE_gc;
 
-    // Enable the ADCA
+    // Enable the ADC
+//    ADCA_REFCTRL = ADC_REFSEL_INT1V_gc | ADC_BANDGAP_bm | ADC_TEMPREF_bm;
+//    ADCA_REFCTRL = ADC_REFSEL_VCC_gc;
+    ADCA_REFCTRL = ADC_REFSEL_INT1V_gc;
+    ADCA_CTRLB = ADC_RESOLUTION_12BIT_gc;
+//    ADCA_PRESCALER = ADC_PRESCALER0_bm | ADC_PRESCALER1_bm; // 32Mhz /32 = 1Mhz
+    ADCA_PRESCALER = ADC_PRESCALER_DIV32_gc; // 32Mhz/256 = 125k
     ADCA_CTRLA = ADC_ENABLE_bm;
 }
 
 
 int adc_read (uint8_t channel) {
-    int i;
+    int sum;
     uint8_t j;
-
-//    PORTA.DIRCLR = (1<<c);
-    ADCA_CTRLA = ADC_ENABLE_bm;
-    ADCA_CTRLB = ADC_RESOLUTION_12BIT_gc;
-//    ADCA_REFCTRL = ADC_REFSEL_INT1V_gc | ADC_BANDGAP_bm | ADC_TEMPREF_bm;
-//    ADCA_REFCTRL = ADC_REFSEL_VCC_gc;
-    ADCA_REFCTRL = ADC_REFSEL_INT1V_gc;
-//    ADCA_PRESCALER = ADC_PRESCALER0_bm | ADC_PRESCALER1_bm; // 32Mhz /32 = 1Mhz
-    ADCA_PRESCALER = ADC_PRESCALER_DIV32_gc; // 32Mhz/256 = 125k
 
     if (channel>=10) {
         ADCA.CH0.CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;	 // internal source
@@ -59,19 +56,21 @@ int adc_read (uint8_t channel) {
 //    ADCA.CH0.MUXCTRL = ADC_CH_MUXINT_TEMP_gc;
     } else {
         ADCA.CH0.CTRL = ADC_CH_INPUTMODE_SINGLEENDED_gc;	 // single ended
+        ADCA.CH0.MUXCTRL = (channel<<3);	 // Gnd
     }
 //    ADCA.CH0.MUXCTRL = c;	 // PORTA:2
 //    ADCA.CH0.MUXCTRL = 1;	 // Vin
-    ADCA.CH0.MUXCTRL = (channel<<3);	 // Gnd
 //    ADCA.CH0.CTRL |= ADC_CH_START_bm; // start conversion on channel 0
-    i=0;
+
+    // Take multiple readings and average them out
+    sum=0;
     for (j=0; j<ADCA_AVGCOUNT; j++) {
         ADCA.CTRLA |= ADC_CH0START_bm;
 
         while(!ADCA.CH0.INTFLAGS);
         ADCA.CH0.INTFLAGS=ADC_CH_CHIF_bm;
-        i += ADCA.CH0RES;
+        sum += ADCA.CH0RES;
     }
-    return (i/ADCA_AVGCOUNT) - ADCA_OFFSET;
+    return (sum/ADCA_AVGCOUNT) - ADCA_OFFSET;
 }
 

@@ -55,6 +55,10 @@ ISR(TCC0_OVF_vect) {
     }
 }
 
+void util_wait_ms (int ms) {
+    while ((millisec%ms)>0);
+}
+
 void util_init () {
     PMIC_CTRL = PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm;
     CPU_SREG = CPU_I_bm;    // Enable global interrupts

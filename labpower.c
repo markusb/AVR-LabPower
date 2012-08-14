@@ -39,7 +39,6 @@ volatile int adc_vcc;
 
 int main () {
     int count = 0;
-    int mainc = 0;
     unsigned char c,d;
 
     int tempref = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE0)) +
@@ -60,17 +59,13 @@ int main () {
     dac_init();
 
     lcd_init();
-//    g_draw_rect(5,5,118,55);
-//    disp_init();
-    lcd_clearscreen();
-
-//    g_draw_string(2,2,"MLP-3003 Lab Power !",0);
-    lcd_gotoxy(0,1);
-    fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
 
     while (1) {
         count++;
-        PORTC.OUTTGL = PIN6_bm;
+
+        disp_clear_dont_refresh();
+        lcd_gotoxy(0,1);
+        fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
 
         if (count>50) {
             util_ledonoff(20);
@@ -78,7 +73,8 @@ int main () {
         } else if (count>45) {
             util_ledonoff(150);
         }
-        if (count==0) printf("[%05d:%05d %05d] main loop\n",seconds,millisec,mainc++);
+        util_wait_ms(50);
+        if (count==0) printf("[%05d:%05d %05d] main loop\n",seconds,millisec);
 
         lcd_gotoxy(0,12);
         fprintf_P(&LCD,PSTR("DAC-Vout: %dV"),dac_v);
@@ -88,8 +84,8 @@ int main () {
 
         adc_vmeter = adc_read(1);
         adc_vin = adc_read(4);
-        adc_iuc = adc_read(5);
-        adc_iout = adc_read(6);
+//        adc_iuc = adc_read(5);
+//        adc_iout = adc_read(6);
         adc_vout = adc_read(7);
         adc_temp = adc_read(10);
         adc_vcc  = adc_read(12);
@@ -103,12 +99,14 @@ int main () {
         fprintf_P(&LCD,PSTR("Iuc %dV"),adc_iuc);
         lcd_gotoxy(0,57);
         fprintf_P(&LCD,PSTR("Iout %dV"),adc_iout);
-        lcd_gotoxy(90,12);
-        fprintf_P(&LCD,PSTR("%dV"),adc_dac0);
-        lcd_gotoxy(90,21);
-        fprintf_P(&LCD,PSTR("%dV"),adc_vcc);
-        lcd_gotoxy(90,30);
-        fprintf_P(&LCD,PSTR("%dV"),adc_temp);
+        lcd_gotoxy(80,12);
+        fprintf_P(&LCD,PSTR("%dVout"),adc_vout);
+        lcd_gotoxy(80,21);
+        fprintf_P(&LCD,PSTR("%dVdac"),adc_dac0);
+        lcd_gotoxy(80,30);
+        fprintf_P(&LCD,PSTR("%dVcc"),adc_vcc);
+        lcd_gotoxy(80,39);
+        fprintf_P(&LCD,PSTR("%dTemp"),adc_temp);
 
         c = sw_read();
         switch(c) {
