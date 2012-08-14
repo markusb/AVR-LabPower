@@ -1,6 +1,6 @@
 
 
-#define ROT_V_PINS (PIN1_bm | PIN1_bm)  // PD0 PD1
+#define ROT_V_PINS (PIN0_bm | PIN1_bm)  // PD0 PD1
 #define ROT_I_PINS (PIN3_bm | PIN4_bm)  // PD3 PD4
 #define BUT_V_PIN  PIN2_bm              // PD2
 #define BUT_I_PIN  PIN5_bm              // PD5

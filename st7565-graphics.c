@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <avr/pgmspace.h>
+#include "st7565-driver.h"
 #include "st7565-graphics.h"
 #include "st7565-font-std.h"
 #define G_FONT_DEFAULT font_standard

@@ -10,7 +10,8 @@ PORT           = usb
 MCU_TARGET     = atxmega16a4
 AVRDUDE_TARGET = x16a4
 OPTIMIZE       = -Os
-INCLUDES	= -I /usr/local/asf-3.3.0 -I /usr/local/asf-3.3.0/xmega/utils -I /usr/local/asf-3.3.0/common/utils -I /usr/local/asf-3.3.0/xmega/utils/preprocessor
+#INCLUDES	   = -I /usr/local/asf-3.3.0 -I /usr/local/asf-3.3.0/xmega/utils -I /usr/local/asf-3.3.0/common/utils -I /usr/local/asf-3.3.0/xmega/utils/preprocessor
+INCLUDES	   =
 DEFS           = -D F_CPU=32000000
 LIBS           = -L Dogm/utility
 
@@ -22,7 +23,8 @@ CC             = avr-gcc
 
 # Override is only needed by avr-lib build system.
 
-override CFLAGS        = -g -DF_CPU=$(F_CPU) -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS) $(INCLUDES)
+#override CFLAGS        = -g -DF_CPU=$(F_CPU) -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS) $(INCLUDES)
+override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS) $(INCLUDES)
 override LDFLAGS       = -Wl,-Map,$(PRG).map
 
 OBJCOPY        = avr-objcopy

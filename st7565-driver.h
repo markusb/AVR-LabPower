@@ -16,3 +16,7 @@
 #define RES_BIT  4
 
 void disp_send_frame();
+void disp_init();
+void disp_clear();
+void disp_clear_dont_refresh();
+void disp_set_pixel(uint8_t,uint8_t,uint8_t);

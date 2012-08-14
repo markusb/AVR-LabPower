@@ -21,6 +21,7 @@
 
 
 extern int seconds;
+extern int millisec;
 extern char *build;
 
 //FILE *s;
@@ -35,6 +36,7 @@ volatile int adc_vout;
 
 int main () {
     int count = 0;
+    int mainc = 0;
     unsigned char c,d;
 
     int tempref = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE0)) +
@@ -43,7 +45,7 @@ int main () {
     uart_init();
     stdout = &mystdout;
     util_clockinit();
-    //printf("MLP-3003 V%s initializing\n",FWVERSION);
+    printf("MLP3003 V%s, build %s initializing\n",FWVERSION,build);
 
     // Set up LEDs with PWM
     util_init();
@@ -67,17 +69,17 @@ int main () {
         count++;
         PORTC.OUTTGL = PIN6_bm;
 
-        if (count>100) {
+        if (count>50) {
             util_ledonoff(20);
             count=0;
-        } else if (count>90) {
+        } else if (count>45) {
             util_ledonoff(150);
         }
-  	    printf("[%05d] main loop\n",count++);
+        if (count==0) printf("[%05d:%05d %05d] main loop\n",seconds,millisec,mainc);
 
-        lcd_gotoxy(1,12);
+        lcd_gotoxy(0,12);
         fprintf_P(&LCD,PSTR("Vout (DAC) %dV \n"),dac_v);
-        lcd_gotoxy(1,21);
+        lcd_gotoxy(0,21);
         fprintf_P(&LCD,PSTR("Ilimit(DAC) %dI \n"),dac_i);
 //        g_fill_rect(10,10,50,30);
 /*
