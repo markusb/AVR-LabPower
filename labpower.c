@@ -21,6 +21,7 @@
 
 
 extern int seconds;
+extern char *build;
 
 //FILE *s;
 char buf[20];
@@ -75,9 +76,9 @@ int main () {
   	    printf("[%05d] main loop\n",count++);
 
         lcd_gotoxy(1,12);
-        fprintf_P(&LCD,PSTR("Vout (DAC) %dV\n"),dac_v);
+        fprintf_P(&LCD,PSTR("Vout (DAC) %dV \n"),dac_v);
         lcd_gotoxy(1,21);
-        fprintf_P(&LCD,PSTR("Ilimit(DAC) %dI\n"),dac_i);
+        fprintf_P(&LCD,PSTR("Ilimit(DAC) %dI \n"),dac_i);
 //        g_fill_rect(10,10,50,30);
 /*
         adc_vmeter = adc_read(1);
