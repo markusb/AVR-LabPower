@@ -55,17 +55,27 @@ ISR(TCC0_OVF_vect) {
     }
 }
 
+ISR(TCC0_CCB_vect) {
+    PORTC.OUTTGL = PIN6_bm;
+    millisec++;
+    if (millisec>=1000) {
+        millisec=0;
+        seconds++;
+    }
+}
+
 void util_init () {
-    PMIC_CTRL = PMIC_LOLVLEN_bm;
+    PMIC_CTRL = PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_HILVLEN_bm;
 
     // Initialize TCC0 for LED PWM and ms interrupt tick
     PORTC.DIRSET = PIN0_bm | PIN1_bm;	// Set PC0 and PC1 as output
     TCC0_PER = 32000;			        // Period length
-    TCC0_CTRLA = TC_CLKSEL_DIV1_gc;	// Clock source = system clock (32Mhz)
-    TCC0_CTRLB = TC_WGMODE_SS_gc | TC0_CCAEN_bm | TC0_CCBEN_bm; // Enable A,B set single slope mode;
-    TCC0_CCA = 16384;
-    TCC0_CCB = 16384;
+    TCC0_CTRLA = TC_CLKSEL_DIV1_gc;	    // Clock source = system clock (32Mhz)
+    TCC0_CTRLB = TC_WGMODE_SS_gc | TC0_CCAEN_bm | TC0_CCBEN_bm; // Enable A&B outputs, set single slope mode;
+    TCC0_CCA = 10000;                   // Initial PWM: 30%
+    TCC0_CCB = 10000;                   // Initiel PWM: 30%
     TCC0_INTCTRLA = TC1_OVFINTLVL0_bm;
+    TCC0_INTCTRLB = TC1_CCBINTLVL0_bm;
 
     PORTC.DIRSET = PIN6_bm;
 }

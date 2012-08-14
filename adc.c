@@ -24,6 +24,15 @@ void adc_init () {
     ADCA.CALH = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, ADCACAL1) );
     // PORTA is all inputs
     PORTA.DIR = 0;
+    PORTA.PIN0CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN1CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN2CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN3CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN4CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN5CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN6CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+    PORTA.PIN7CTRL = PORT_ISC0_bm | PORT_ISC1_bm | PORT_ISC2_bm;
+
     // Enable the ADCA
     ADCA_CTRLA = ADC_ENABLE_bm;
 }

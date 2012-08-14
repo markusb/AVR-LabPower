@@ -75,14 +75,14 @@ int main () {
         } else if (count>45) {
             util_ledonoff(150);
         }
-        if (count==0) printf("[%05d:%05d %05d] main loop\n",seconds,millisec,mainc);
+        if (count==0) printf("[%05d:%05d %05d] main loop\n",seconds,millisec,mainc++);
 
         lcd_gotoxy(0,12);
-        fprintf_P(&LCD,PSTR("Vout (DAC) %dV \n"),dac_v);
+        fprintf_P(&LCD,PSTR("DAC-Vout: %dV"),dac_v);
         lcd_gotoxy(0,21);
-        fprintf_P(&LCD,PSTR("Ilimit(DAC) %dI \n"),dac_i);
+        fprintf_P(&LCD,PSTR("DAC-Iout:  %dA"),dac_i);
 //        g_fill_rect(10,10,50,30);
-/*
+
         adc_vmeter = adc_read(1);
         adc_vin = adc_read(4);
         adc_iuc = adc_read(5);
@@ -99,7 +99,6 @@ int main () {
         fprintf_P(&LCD,PSTR("Iout %dV\n"),adc_iout);
         lcd_gotoxy(60,57);
         fprintf_P(&LCD,PSTR("Vout %dV\n"),adc_vout);
-*/
 
         c = sw_read();
         switch(c) {
@@ -113,7 +112,7 @@ int main () {
             case BUT_S3: d+=10; break;
         }
         lcd_gotoxy(60,48);
-        fprintf_P(&LCD,PSTR("Key %d"),c);
+        fprintf_P(&LCD,PSTR("Key %d "),c);
 
         disp_send_frame();
     }

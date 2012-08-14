@@ -12,6 +12,9 @@
 #include "switch.h"
 #include "rotary.h"
 
+extern int millisec;
+extern int seconds;
+
 static volatile uint8_t rot_v = R_START;
 static volatile uint8_t rot_i = R_START;
 
@@ -24,23 +27,29 @@ void sw_init () {
     PORTB.PIN2CTRL = PORT_OPC_PULLUP_gc;
     PORTB.PIN3CTRL = PORT_OPC_PULLUP_gc;
     PORTC.PIN1CTRL = PORT_OPC_PULLUP_gc;
+
     PORTD.PIN0CTRL = PORT_OPC_PULLUP_gc;
     PORTD.PIN1CTRL = PORT_OPC_PULLUP_gc;
     PORTD.PIN2CTRL = PORT_OPC_PULLUP_gc;
     PORTD.PIN3CTRL = PORT_OPC_PULLUP_gc;
     PORTD.PIN4CTRL = PORT_OPC_PULLUP_gc;
     PORTD.PIN5CTRL = PORT_OPC_PULLUP_gc;
+
+    // Interrupt 0 for rotary inputs
+    PORTD.INTCTRL = PORT_INT0LVL0_bm;
+    PORTD.INT0MASK = ROT_I_PINS | ROT_V_PINS;
+}
+
+ISR(PORTD_INT0_vect) {
+    PORTC.OUTTGL = PIN6_bm;
+    millisec++;
+    if (millisec>=1000) {
+        millisec=0;
+        seconds++;
+    }
 }
 
 uint8_t sw_read () {
-//    uint8_t pin_v = ((PORTD.IN & ROT_V_PINS));
-//    uint8_t pin_i = ((PORTD.IN & ROT_I_PINS)>>3);
-
-//    rot_v = ttable[rot_v & 0x0f][pin_v];
-//    rot_i = ttable[rot_i & 0x0f][pin_i];
-
-//    printf("sw_read: pv=%02X sv=%02X - pi=%02X si=%02X\n",pin_v,rot_v,pin_i,rot_i);
-
     rot_v = ttable[rot_v & 0x0f][PORTD.IN & ROT_V_PINS];
     rot_i = ttable[rot_i & 0x0f][(PORTD.IN & ROT_I_PINS)>>3];
 
