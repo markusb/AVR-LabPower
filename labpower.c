@@ -33,6 +33,7 @@ volatile int adc_vin;
 volatile int adc_iuc;
 volatile int adc_iout;
 volatile int adc_vout;
+volatile int adc_dacv;
 
 int main () {
     int count = 0;
@@ -88,26 +89,27 @@ int main () {
         adc_iuc = adc_read(5);
         adc_iout = adc_read(6);
         adc_vout = adc_read(7);
+        adc_dacv = adc_read(13);
 
-        lcd_gotoxy(1,30);
-        fprintf_P(&LCD,PSTR("Vmeter %dV\n"),adc_vmeter);
-        lcd_gotoxy(1,39);
-        fprintf_P(&LCD,PSTR("Vin %dV\n"),adc_vin);
-        lcd_gotoxy(1,48);
-        fprintf_P(&LCD,PSTR("Iuc %dV\n"),adc_iuc);
-        lcd_gotoxy(1,57);
-        fprintf_P(&LCD,PSTR("Iout %dV\n"),adc_iout);
-        lcd_gotoxy(60,57);
-        fprintf_P(&LCD,PSTR("Vout %dV\n"),adc_vout);
+        lcd_gotoxy(0,30);
+        fprintf_P(&LCD,PSTR("Vmeter %dV"),adc_vmeter);
+        lcd_gotoxy(0,39);
+        fprintf_P(&LCD,PSTR("Vin %dV"),adc_vin);
+        lcd_gotoxy(0,48);
+        fprintf_P(&LCD,PSTR("Iuc %dV"),adc_iuc);
+        lcd_gotoxy(0,57);
+        fprintf_P(&LCD,PSTR("Iout %dV"),adc_iout);
+        lcd_gotoxy(80,12);
+        fprintf_P(&LCD,PSTR("%dV"),adc_dacv);
 
         c = sw_read();
         switch(c) {
-            case ROT_V_CW: dac_v++; break;
-            case ROT_V_CCW: dac_v--; break;
+            case ROT_V_CW: dac_v++; dac_set(0,dac_v); break;
+            case ROT_V_CCW: dac_v--; dac_set(1,dac_i);break;
             case ROT_I_CW: dac_i++; break;
             case ROT_I_CCW: dac_i--; break;
-            case BUT_V: dac_v=100; break;
-            case BUT_I: dac_i=100; break;
+            case BUT_V: dac_v=100; dac_set(0,dac_v); break;
+            case BUT_I: dac_i=100; dac_set(1,dac_i); break;
             case BUT_S2: d-=10; break;
             case BUT_S3: d+=10; break;
         }

@@ -66,6 +66,7 @@ ISR(TCC0_CCB_vect) {
 
 void util_init () {
     PMIC_CTRL = PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_HILVLEN_bm;
+    CPU_SREG = CPU_I_bm;    // Enable global interrupts
 
     // Initialize TCC0 for LED PWM and ms interrupt tick
     PORTC.DIRSET = PIN0_bm | PIN1_bm;	// Set PC0 and PC1 as output

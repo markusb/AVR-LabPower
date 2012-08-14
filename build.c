@@ -1,2 +1,2 @@
 #include <avr/pgmspace.h>
-char * build = "120814-19";
+char * build = "120814-20";

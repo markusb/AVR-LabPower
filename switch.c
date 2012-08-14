@@ -36,7 +36,7 @@ void sw_init () {
     PORTD.PIN5CTRL = PORT_OPC_PULLUP_gc;
 
     // Interrupt 0 for rotary inputs
-    PORTD.INTCTRL = PORT_INT0LVL0_bm;
+    PORTD.INTCTRL = PORT_INT0LVL_LO_gc;
     PORTD.INT0MASK = ROT_I_PINS | ROT_V_PINS;
 }
 

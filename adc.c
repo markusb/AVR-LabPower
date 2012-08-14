@@ -51,7 +51,7 @@ int adc_read (uint8_t channel) {
 //    ADCA_PRESCALER = ADC_PRESCALER0_bm | ADC_PRESCALER1_bm; // 32Mhz /32 = 1Mhz
     ADCA_PRESCALER = ADC_PRESCALER_DIV256_gc; // 32Mhz/256 = 125k
 
-    if (channel>10) {
+    if (channel>=10) {
         ADCA.CH0.CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;	 // internal source
         ADCA.CH0.MUXCTRL = ((channel-10)<<3);	 // Temp - Bandgap - Vcc - DAC
 //    ADCA.CH0.MUXCTRL = ADC_CH_MUXINT_SCALEDVCC_gc; // Vcc/10
@@ -63,7 +63,6 @@ int adc_read (uint8_t channel) {
 //    ADCA.CH0.MUXCTRL = c;	 // PORTA:2
 //    ADCA.CH0.MUXCTRL = 1;	 // Vin
     ADCA.CH0.MUXCTRL = (channel<<3);	 // Gnd
-    _delay_ms(1);
 //    ADCA.CH0.CTRL |= ADC_CH_START_bm; // start conversion on channel 0
     i=0;
     for (j=0; j<ADCA_AVGCOUNT; j++) {
