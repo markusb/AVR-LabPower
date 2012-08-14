@@ -48,3 +48,4 @@ uint8_t sw_read () {
    	if (!(PORTB.IN & BUT_S3_PIN)) { return BUT_S3; }
    	return 0;
 }
+

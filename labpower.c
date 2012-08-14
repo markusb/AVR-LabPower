@@ -60,8 +60,8 @@ int main () {
     lcd_clearscreen();
 
 //    g_draw_string(2,2,"MLP-3003 Lab Power !",0);
-    lcd_gotoxy(1,1);
-    fprintf_P(&LCD,PSTR("MLP-3003 V%s\n"),FWVERSION);
+    lcd_gotoxy(0,1);
+    fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
 
     while (1) {
         count++;
