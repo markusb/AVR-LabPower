@@ -12,6 +12,8 @@
 
 void dac_init () {
 //    DACA.CTRLA = DAC_IDOEN_bm | DAC_CH1EN_bm | DAC_ENABLE_bm;
+    DACB.CTRLB = 0;
+    DACB.CTRLC = 0;
     DACB.CTRLA = DAC_IDOEN_bm | DAC_ENABLE_bm;
 //    DACB.CTRLB = DAC_CHSEL1_bm;
 //    DAC_CH0GAINCAL =

@@ -49,7 +49,7 @@ int adc_read (uint8_t channel) {
 //    ADCA_REFCTRL = ADC_REFSEL_VCC_gc;
     ADCA_REFCTRL = ADC_REFSEL_INT1V_gc;
 //    ADCA_PRESCALER = ADC_PRESCALER0_bm | ADC_PRESCALER1_bm; // 32Mhz /32 = 1Mhz
-    ADCA_PRESCALER = ADC_PRESCALER_DIV256_gc; // 32Mhz/256 = 125k
+    ADCA_PRESCALER = ADC_PRESCALER_DIV32_gc; // 32Mhz/256 = 125k
 
     if (channel>=10) {
         ADCA.CH0.CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;	 // internal source

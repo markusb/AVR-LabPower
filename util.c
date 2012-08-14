@@ -47,16 +47,7 @@ uint8_t util_read_calib_byte( uint8_t index ) {
 * Interrupt on TCC0 overflow = interrupt every ms
 */
 ISR(TCC0_OVF_vect) {
-    PORTC.OUTTGL = PIN6_bm;
-    millisec++;
-    if (millisec>=1000) {
-        millisec=0;
-        seconds++;
-    }
-}
-
-ISR(TCC0_CCB_vect) {
-    PORTC.OUTTGL = PIN6_bm;
+//    PORTC.OUTTGL = PIN6_bm;
     millisec++;
     if (millisec>=1000) {
         millisec=0;
@@ -65,7 +56,7 @@ ISR(TCC0_CCB_vect) {
 }
 
 void util_init () {
-    PMIC_CTRL = PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_HILVLEN_bm;
+    PMIC_CTRL = PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm;
     CPU_SREG = CPU_I_bm;    // Enable global interrupts
 
     // Initialize TCC0 for LED PWM and ms interrupt tick
@@ -75,8 +66,8 @@ void util_init () {
     TCC0_CTRLB = TC_WGMODE_SS_gc | TC0_CCAEN_bm | TC0_CCBEN_bm; // Enable A&B outputs, set single slope mode;
     TCC0_CCA = 10000;                   // Initial PWM: 30%
     TCC0_CCB = 10000;                   // Initiel PWM: 30%
-    TCC0_INTCTRLA = TC1_OVFINTLVL0_bm;
-    TCC0_INTCTRLB = TC1_CCBINTLVL0_bm;
+    TCC0_INTCTRLA = TC_OVFINTLVL_MED_gc;
+//    TCC0_INTCTRLB = TC1_CCBINTLVL0_bm;
 
     PORTC.DIRSET = PIN6_bm;
 }

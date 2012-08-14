@@ -33,7 +33,9 @@ volatile int adc_vin;
 volatile int adc_iuc;
 volatile int adc_iout;
 volatile int adc_vout;
-volatile int adc_dacv;
+volatile int adc_dac0;
+volatile int adc_temp;
+volatile int adc_vcc;
 
 int main () {
     int count = 0;
@@ -89,7 +91,9 @@ int main () {
         adc_iuc = adc_read(5);
         adc_iout = adc_read(6);
         adc_vout = adc_read(7);
-        adc_dacv = adc_read(13);
+        adc_temp = adc_read(10);
+        adc_vcc  = adc_read(12);
+        adc_dac0 = adc_read(13);
 
         lcd_gotoxy(0,30);
         fprintf_P(&LCD,PSTR("Vmeter %dV"),adc_vmeter);
@@ -99,8 +103,12 @@ int main () {
         fprintf_P(&LCD,PSTR("Iuc %dV"),adc_iuc);
         lcd_gotoxy(0,57);
         fprintf_P(&LCD,PSTR("Iout %dV"),adc_iout);
-        lcd_gotoxy(80,12);
-        fprintf_P(&LCD,PSTR("%dV"),adc_dacv);
+        lcd_gotoxy(90,12);
+        fprintf_P(&LCD,PSTR("%dV"),adc_dac0);
+        lcd_gotoxy(90,21);
+        fprintf_P(&LCD,PSTR("%dV"),adc_vcc);
+        lcd_gotoxy(90,30);
+        fprintf_P(&LCD,PSTR("%dV"),adc_temp);
 
         c = sw_read();
         switch(c) {

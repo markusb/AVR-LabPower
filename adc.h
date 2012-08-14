@@ -12,7 +12,7 @@
  */
 
 #define ADCA_OFFSET 176
-#define ADCA_AVGCOUNT 1
+#define ADCA_AVGCOUNT 8
 
 void adc_init ();
 int adc_read (uint8_t);
