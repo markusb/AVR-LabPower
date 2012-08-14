@@ -55,8 +55,32 @@ ISR(TCC0_OVF_vect) {
     }
 }
 
-void util_wait_ms (int ms) {
-    while ((millisec%ms)>0);
+// Format an integer
+char * ifmt_buf[20];
+char * util_ifmt(int num, uint8_t dp) {
+    uint8_t bp;
+    bp=7;
+    ifmt_buf[bp--]='\0';
+    while(dp) {
+        ifmt_buf[bp--] = 0x30+(num%10);
+        num = num/10;
+    }
+    ifmt_buf[bp--]='.';
+    while(num){
+        ifmt_buf[bp--] = 0x30+(num%10);
+        num = num/10;
+    }
+    return &ifmt_buf[++bp];
+}
+
+uint8_t util_wait_ms (int ms) {
+    uint8_t delay,t;
+    delay = ms-(millisec%ms);
+    t=delay;
+//    printf("util_wait_ms: %d ms=%d delay=%d\n",millisec,ms,delay);
+    while (delay--) _delay_ms(1);
+//    while ((millisec%ms)>0);
+    return t;
 }
 
 void util_init () {

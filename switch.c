@@ -13,16 +13,16 @@
 #include "switch.h"
 #include "rotary.h"
 
-extern int millisec;
-extern int seconds;
+volatile int icount = 0;
+
 static uint8_t lastc;
 
 static volatile uint8_t rot_v = R_START;
 static volatile uint8_t rot_i = R_START;
 
 static volatile char rotbuf[32];
-static volatile uint8_t rotbwptr = 0;
-static volatile uint8_t rotbrptr = 0;
+volatile uint8_t rotbwptr = 0;
+volatile uint8_t rotbrptr = 0;
 
 void sw_init () {
     // Set ports/pins as input
@@ -60,10 +60,13 @@ ISR(PORTD_INT0_vect) {
    	if ((rot_i&0x30) == DIR_CW)  { c=ROT_I_CW;  }
    	if ((rot_i&0x30) == DIR_CCW) { c=ROT_I_CCW; }
 
-   	if (c>=0) {
-   	    rotbuf[rotbwptr++] = c;
-        if (rotbwptr>=32) rotbwptr=0;
+   	if (c>0) {
+   	    if (rotbwptr+1 != rotbrptr) {
+   	        rotbuf[rotbwptr++] = c;
+            if (rotbwptr>=32) rotbwptr=0;
+   	    }
    	}
+   	icount++;
 }
 
 uint8_t sw_read () {
@@ -73,6 +76,7 @@ uint8_t sw_read () {
         c = rotbuf[rotbrptr++];
         if (rotbrptr>=32) rotbrptr=0;
         sei();
+//        printf("sw_read: rot: p=%d c=%d\n",rotbrptr,c);
         return c;
     }
 
@@ -82,6 +86,8 @@ uint8_t sw_read () {
    	else if (!(PORTB.IN & BUT_S2_PIN)) { c=BUT_S2; }
    	else if (!(PORTB.IN & BUT_S3_PIN)) { c=BUT_S3; }
    	else { c=0; lastc=0; }
+//   	printf("sw_read: c=%d lastc=%d\n",c,lastc);
    	if (c==lastc) return 0;
+   	lastc = c;
    	return c;
 }

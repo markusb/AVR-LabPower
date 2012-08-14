@@ -19,6 +19,10 @@
 #include "labpower.h"
 #include "st7565.h"
 
+// for debugging purposes
+extern int icount;
+extern uint8_t rotbwptr;
+extern uint8_t rotbrptr;
 
 extern int seconds;
 extern int millisec;
@@ -40,6 +44,7 @@ volatile int adc_vcc;
 int main () {
     int count = 0;
     unsigned char c,d;
+    uint8_t t;
 
     int tempref = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE0)) +
                   util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE1)) * 256;
@@ -67,15 +72,16 @@ int main () {
         lcd_gotoxy(0,1);
         fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
 
-        if (count>20) {
+        if (count>10) {
             util_ledonoff(20);
             count=0;
-        } else if (count<2) {
+        } else if (count>9) {
             util_ledonoff(150);
         }
-//        util_wait_ms(50);
-        _delay_ms(100);
-        if (count==0) printf("[%05d:%05d] main loop\n",seconds,millisec);
+        t=util_wait_ms(100);
+//        _delay_ms(50);
+//        if (count==0) printf("[%05d:%05d] icount=%d w=%d r=%d \n",seconds,millisec,icount,rotbwptr,rotbrptr);
+        if (count==0) printf("[%05d:%05d %d] \n",seconds,millisec,t );
 
         lcd_gotoxy(0,12);
         fprintf_P(&LCD,PSTR("DAC-Vout: %dV"),dac_v);
@@ -109,38 +115,60 @@ int main () {
         lcd_gotoxy(80,39);
         fprintf_P(&LCD,PSTR("%dTemp"),adc_temp);
 
-        c = sw_read();
-        if (c==ROT_V_CW) {
-            dac_v += rot_decade;
-            dac_set(0,dac_v);
-            printf("main: set_dac(0,%d)\n",dac_v);
-        }
-        if (c==ROT_V_CCW) {
-            dac_v -= rot_decade;
-            dac_set(0,dac_v);
-            printf("main: set_dac(0,%d)\n",dac_v);
-        }
-        if (c=BUT_V) {
-            switch (rot_decade) {
-                case 1: rot_decade = 10; break;
-                case 10: rot_decade = 100; break;
-                case 100: rot_decade = 1; break;
-                default: rot_decade = 1; break;
-                prtintf("main: rot_decade=%d\n",rot_decade);
+//        char * util_ifmt(int, uint8_t
+        lcd_gotoxy(80,48);
+        fprintf_P(&LCD,PSTR("%s Vm"),util_ifmt(adc_vmeter,1));
+
+
+        while (c = sw_read()) {
+            if (c==ROT_V_CW) {
+                dac_v += rot_decade;
+                if (dac_v>4000) dac_v = 4000;
+                dac_set(0,dac_v);
+                printf("main: set_dac(0,%d)\n",dac_v);
+            }
+            if (c==ROT_V_CCW) {
+                dac_v -= rot_decade;
+                if (dac_v<0) dac_v = 0;
+                dac_set(0,dac_v);
+                printf("main: set_dac(0,%d)\n",dac_v);
+            }
+            if (c==ROT_I_CW) {
+                dac_i += rot_decade;
+                if (dac_i>4000) dac_i = 4000;
+                dac_set(0,dac_i);
+                printf("main: set_dac(1,%d)\n",dac_i);
+            }
+            if (c==ROT_I_CCW) {
+                dac_i -= rot_decade;
+                if (dac_i<0) dac_i = 0;
+                dac_set(0,dac_i);
+                printf("main: set_dac(1,%d)\n",dac_i);
+            }
+            if (c==BUT_V) {
+                switch (rot_decade) {
+                    case 1: rot_decade = 10; break;
+                    case 10: rot_decade = 100; break;
+                    case 100: rot_decade = 1; break;
+                    default: rot_decade = 1; break;
+                }
+                printf("main: rot_decade=%d\n",rot_decade);
+            }
+            if (c==BUT_I) {
+                printf("main: but_i\n");
+            }
+            if (c==BUT_S1) {
+                printf("main: but_s1\n");
+            }
+            if (c==BUT_S2) {
+                printf("main: but_s2\n");
+            }
+            if (c==BUT_S3) {
+                printf("main: but_s3\n");
             }
         }
-        switch(c) {
-//            case ROT_V_CW: dac_v++; ; break;
-//            case ROT_V_CCW: dac_v--; dac_set(1,dac_i);break;
-            case ROT_I_CW: dac_i++; break;
-            case ROT_I_CCW: dac_i--; break;
-//            case BUT_V: dac_v=100; dac_set(0,dac_v); break;
-            case BUT_I: dac_i=100; dac_set(1,dac_i); break;
-            case BUT_S2: d-=10; break;
-            case BUT_S3: d+=10; break;
-        }
-        lcd_gotoxy(60,48);
-        fprintf_P(&LCD,PSTR("Key %d "),c);
+//        lcd_gotoxy(60,48);
+//        fprintf_P(&LCD,PSTR("Key %d "),c);
 
         disp_send_frame();
     }
