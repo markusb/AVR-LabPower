@@ -25,7 +25,7 @@ extern int millisec;
 extern char *build;
 
 //FILE *s;
-char buf[20];
+uint8_t rot_decade=1;
 volatile int dac_v;
 volatile int dac_i;
 volatile int adc_vmeter;
@@ -67,14 +67,15 @@ int main () {
         lcd_gotoxy(0,1);
         fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
 
-        if (count>50) {
+        if (count>20) {
             util_ledonoff(20);
             count=0;
-        } else if (count>45) {
+        } else if (count<2) {
             util_ledonoff(150);
         }
-        util_wait_ms(50);
-        if (count==0) printf("[%05d:%05d %05d] main loop\n",seconds,millisec);
+//        util_wait_ms(50);
+        _delay_ms(100);
+        if (count==0) printf("[%05d:%05d] main loop\n",seconds,millisec);
 
         lcd_gotoxy(0,12);
         fprintf_P(&LCD,PSTR("DAC-Vout: %dV"),dac_v);
@@ -109,12 +110,31 @@ int main () {
         fprintf_P(&LCD,PSTR("%dTemp"),adc_temp);
 
         c = sw_read();
+        if (c==ROT_V_CW) {
+            dac_v += rot_decade;
+            dac_set(0,dac_v);
+            printf("main: set_dac(0,%d)\n",dac_v);
+        }
+        if (c==ROT_V_CCW) {
+            dac_v -= rot_decade;
+            dac_set(0,dac_v);
+            printf("main: set_dac(0,%d)\n",dac_v);
+        }
+        if (c=BUT_V) {
+            switch (rot_decade) {
+                case 1: rot_decade = 10; break;
+                case 10: rot_decade = 100; break;
+                case 100: rot_decade = 1; break;
+                default: rot_decade = 1; break;
+                prtintf("main: rot_decade=%d\n",rot_decade);
+            }
+        }
         switch(c) {
-            case ROT_V_CW: dac_v++; dac_set(0,dac_v); break;
-            case ROT_V_CCW: dac_v--; dac_set(1,dac_i);break;
+//            case ROT_V_CW: dac_v++; ; break;
+//            case ROT_V_CCW: dac_v--; dac_set(1,dac_i);break;
             case ROT_I_CW: dac_i++; break;
             case ROT_I_CCW: dac_i--; break;
-            case BUT_V: dac_v=100; dac_set(0,dac_v); break;
+//            case BUT_V: dac_v=100; dac_set(0,dac_v); break;
             case BUT_I: dac_i=100; dac_set(1,dac_i); break;
             case BUT_S2: d-=10; break;
             case BUT_S3: d+=10; break;

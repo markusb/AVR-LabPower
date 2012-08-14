@@ -15,9 +15,11 @@
 
 extern int millisec;
 extern int seconds;
+static uint8_t lastc;
 
 static volatile uint8_t rot_v = R_START;
 static volatile uint8_t rot_i = R_START;
+
 static volatile char rotbuf[32];
 static volatile uint8_t rotbwptr = 0;
 static volatile uint8_t rotbrptr = 0;
@@ -73,11 +75,13 @@ uint8_t sw_read () {
         sei();
         return c;
     }
-   	if (!(PORTD.IN & BUT_V_PIN))  { return BUT_V;  }
-   	if (!(PORTD.IN & BUT_I_PIN))  { return BUT_I;  }
-//   	if (!(PORTC.IN & BUT_S1_PIN)) { return BUT_S1; }
-   	if (!(PORTB.IN & BUT_S2_PIN)) { return BUT_S2; }
-   	if (!(PORTB.IN & BUT_S3_PIN)) { return BUT_S3; }
-   	return 0;
-}
 
+   	if      (!(PORTD.IN & BUT_V_PIN))  { c=BUT_V;  }
+   	else if (!(PORTD.IN & BUT_I_PIN))  { c=BUT_I;  }
+//   	else if (!(PORTC.IN & BUT_S1_PIN)) { c=BUT_S1; }
+   	else if (!(PORTB.IN & BUT_S2_PIN)) { c=BUT_S2; }
+   	else if (!(PORTB.IN & BUT_S3_PIN)) { c=BUT_S3; }
+   	else { c=0; lastc=0; }
+   	if (c==lastc) return 0;
+   	return c;
+}

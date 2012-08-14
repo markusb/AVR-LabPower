@@ -56,6 +56,7 @@ all: $(PRG).elf lst text #eeprom
 $(PRG).elf: $(OBJ)
 	./build-commit.sh
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	avr-size $(PRG).elf
 
 clean:
 	rm -rf *.o $(PRG).elf *.eps *.png *.pdf *.bak *.hex *.bin *.srec
@@ -79,6 +80,7 @@ srec: $(PRG).srec
 
 %.srec: %.elf
 	$(OBJCOPY) -j .text -j .data -O srec $< $@
+	avr-size $(PRG).elf
 
 %.bin: %.elf
 	$(OBJCOPY) -j .text -j .data -O binary $< $@
