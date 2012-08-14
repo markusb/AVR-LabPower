@@ -52,7 +52,7 @@ DOGDEFS += -DDOG_SPI_CTRL=SPIC_CTRL -DDOG_SPI_DATA=SPIC_DATA -DDOG_SPI_STATUS=SP
 all: $(PRG).elf lst text #eeprom
 
 $(PRG).elf: $(OBJ)
-	build-commit.sh
+	./build-commit.sh
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 clean:
