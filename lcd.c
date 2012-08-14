@@ -19,6 +19,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "lcd.h"
+#include "st7565.h"
 //#include "conf_st7565r.h"
 //#include <common/components/display/st7565r/st7565r.h>
 
@@ -27,6 +28,9 @@
 #define LCD_R PIN4_bm
 #define LCD_SCL PIN7_bm
 #define LCD_SI PIN5_bm
+
+FILE LCD = FDEV_SETUP_STREAM (lcd_putc, NULL, _FDEV_SETUP_WRITE);
+
 /*
 * initialisation:
 * RES low for 10 ms
@@ -133,6 +137,28 @@ void lcd_clearscreen () {
 //        for (x=0; x<132; x++) lcd_senddata((1<<x)|(128>>x));
     }
 }
+
+/*
+*  Simple stdio adaptation to write to the LCD
+*/
+static uint8_t lcd_x;  // Drawing position
+static uint8_t lcd_y;
+
+// Write a char to the current position with a 1 px space afterwards
+int lcd_putc (char c, FILE *stream) {
+    uint8_t i;
+    if((c<' ')||(c>127)) return 0;  // We only have charcter between space and 127
+    lcd_x += g_draw_char_clearBG(lcd_x, lcd_y, c);
+    for (i=0; i<8; i++) disp_set_pixel(lcd_x, lcd_y+i, 0);
+    lcd_x++;
+}
+
+// Set the current position
+void lcd_gotoxy(uint8_t x, uint8_t y) {
+    lcd_x = x;
+    lcd_y = y;
+}
+
 
 void lcd_putcxy (unsigned char c,unsigned char x,unsigned char y) {
     unsigned char i;

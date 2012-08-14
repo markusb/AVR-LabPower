@@ -40,3 +40,6 @@ void lcd_senddata (unsigned char);
 void lcd_putcxy (unsigned char, unsigned char, unsigned char);
 
 #define LCD_SETCONTRAST(c) lcd_sendcmd('\x81');lcd_sendcmd(c);
+extern FILE LCD;
+int lcd_putc (char, FILE *);
+void lcd_gotoxy(uint8_t, uint8_t);

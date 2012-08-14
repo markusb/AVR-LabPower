@@ -15,3 +15,4 @@
 #define RES_DDR  PORTE.DIR
 #define RES_BIT  4
 
+void disp_send_frame();

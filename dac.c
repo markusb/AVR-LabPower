@@ -17,5 +17,6 @@ void dac_set (unsigned char c, int v) {
 }
 
 int dac_test () {
+    return 0;
 }
 

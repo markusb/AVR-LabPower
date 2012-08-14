@@ -6,25 +6,34 @@
  */
 
 #include <stdio.h>
-#include <avr/io.h>
-#include <util/delay.h>
 #include <stddef.h>
+#include <util/delay.h>
+#include <avr/io.h>
+#include <avr/pgmspace.h>
 #include "util.h"
 #include "lcd.h"
 #include "adc.h"
 #include "dac.h"
 #include "uart.h"
+#include "switch.h"
 #include "labpower.h"
 #include "st7565.h"
 
-//#include "Dogm/utility/NHD12865AR.h"
 
-FILE *s;
+extern int seconds;
+
+//FILE *s;
 char buf[20];
+volatile int dac_v;
+volatile int dac_i;
+volatile int adc_vmeter;
+volatile int adc_vin;
+volatile int adc_iuc;
+volatile int adc_iout;
+volatile int adc_vout;
 
 int main () {
     int count = 0;
-    int adc;
     unsigned char c,d;
 
     int tempref = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE0)) +
@@ -33,69 +42,77 @@ int main () {
     uart_init();
     stdout = &mystdout;
     util_clockinit();
-    printf("MLP-3003 V%s initializing\n",FWVERSION);
+    //printf("MLP-3003 V%s initializing\n",FWVERSION);
 
     // Set up LEDs with PWM
-    util_TC0_init();
+    util_init();
     util_ledonoff(20);
     lcd_setbacklight(200);
 
+    sw_init();
     adc_init();
+    dac_init();
 
     lcd_init();
-    disp_clear();
-    g_draw_rect(0,0,128,65);
-    g_draw_rect(5,5,118,55);
+//    g_draw_rect(5,5,118,55);
 //    disp_init();
-//    lcd_clearscreen();
+    lcd_clearscreen();
 
-    g_draw_string(4,0,"MLP-3003 Lab Power !",0);
+//    g_draw_string(2,2,"MLP-3003 Lab Power !",0);
+    lcd_gotoxy(1,1);
+    fprintf_P(&LCD,PSTR("MLP-3003 V%s\n"),FWVERSION);
+
     while (1) {
-        util_ledonoff(20);
-	printf("[%05d] main loop\n",count++);
-        _delay_ms(500);
-//        dog_SetInvertPixelMode(1);
-//        lcd_sendcmd('\xA6');
-//        lcd_sendcmd(LCD_ST7565R_CMD_PIXELNORM);
+        count++;
+        PORTC.OUTTGL = PIN6_bm;
+
+        if (count>100) {
+            util_ledonoff(20);
+            count=0;
+        } else if (count>90) {
+            util_ledonoff(150);
+        }
+  	    printf("[%05d] main loop\n",count++);
+
+        lcd_gotoxy(1,12);
+        fprintf_P(&LCD,PSTR("Vout (DAC) %dV\n"),dac_v);
+        lcd_gotoxy(1,21);
+        fprintf_P(&LCD,PSTR("Ilimit(DAC) %dI\n"),dac_i);
 //        g_fill_rect(10,10,50,30);
-        g_draw_string(4,10,"ADC-Vmeter:",0);
-        adc = adc_read(1);
-        sprintf(buf,"%d  ",adc);
-        g_draw_string(80,10,buf,0);
+/*
+        adc_vmeter = adc_read(1);
+        adc_vin = adc_read(4);
+        adc_iuc = adc_read(5);
+        adc_iout = adc_read(6);
+        adc_vout = adc_read(7);
 
-        g_draw_string(4,19,"ADC-Vin:",0);
-        adc = adc_read(4);
-        sprintf(buf,"%d  ",adc);
-        g_draw_string(80,19,buf,0);
+        lcd_gotoxy(1,30);
+        fprintf_P(&LCD,PSTR("Vmeter %dV\n"),adc_vmeter);
+        lcd_gotoxy(1,39);
+        fprintf_P(&LCD,PSTR("Vin %dV\n"),adc_vin);
+        lcd_gotoxy(1,48);
+        fprintf_P(&LCD,PSTR("Iuc %dV\n"),adc_iuc);
+        lcd_gotoxy(1,57);
+        fprintf_P(&LCD,PSTR("Iout %dV\n"),adc_iout);
+        lcd_gotoxy(60,57);
+        fprintf_P(&LCD,PSTR("Vout %dV\n"),adc_vout);
+*/
 
-        g_draw_string(4,28,"Temp:",0);
-        adc = adc_read(10);
-        sprintf(buf,"%d  ",adc);
-        g_draw_string(80,28,buf,0);
-
-        g_draw_string(4,37,"Vcc:",0);
-        adc = adc_read(2);
-        sprintf(buf,"%d  ",adc/4);
-        g_draw_string(80,37,buf,0);
-
-        g_draw_string(4,46,"DAC:",0);
-        adc = adc_read(13);
-        sprintf(buf,"%d  ",adc);
-        g_draw_string(80,46,buf,0);
-
-        g_draw_string(4,55,"Power/Tempref:",0);
-        sprintf(buf,"%d  ",tempref);
-        g_draw_string(80,55,buf,0);
+        c = sw_read();
+        switch(c) {
+            case ROT_V_CW: dac_v++; break;
+            case ROT_V_CCW: dac_v--; break;
+            case ROT_I_CW: dac_i++; break;
+            case ROT_I_CCW: dac_i--; break;
+            case BUT_V: dac_v=100; break;
+            case BUT_I: dac_i=100; break;
+            case BUT_S2: d-=10; break;
+            case BUT_S3: d+=10; break;
+        }
+        lcd_gotoxy(60,48);
+        fprintf_P(&LCD,PSTR("Key %d"),c);
 
         disp_send_frame();
-        util_ledonoff(150);
-        _delay_ms(50);
-//        dog_SetInvertPixelMode(0);
-//        lcd_sendcmd('\xA7');
-//        lcd_sendcmd(LCD_ST7565R_CMD_PIXELON);
-//	printf("main loop\n");
-//    uart_putc('B',s);
-//        vary_lcd();
     }
 }
 

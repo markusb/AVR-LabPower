@@ -3,7 +3,7 @@
 #
 
 PRG            = labpower
-OBJ            = labpower.o lcd.o switch.o util.o uart.o adc.o st7565-driver.o st7565-graphics.o
+OBJ            = labpower.o lcd.o switch.o util.o uart.o adc.o dac.o st7565-driver.o st7565-graphics.o
 PROGRAMMER     = dragon_pdi
 PORT           = usb
 #MCU_TARGET     = atxmega32a4u
@@ -52,6 +52,7 @@ DOGDEFS += -DDOG_SPI_CTRL=SPIC_CTRL -DDOG_SPI_DATA=SPIC_DATA -DDOG_SPI_STATUS=SP
 all: $(PRG).elf lst text #eeprom
 
 $(PRG).elf: $(OBJ)
+	build-commit.sh
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 clean:

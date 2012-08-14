@@ -16,6 +16,7 @@
 #include <avr/pgmspace.h>
 #include <stddef.h>
 #include "adc.h"
+#include "util.h"
 
 void adc_init () {
     // Calibrate ADC
@@ -31,7 +32,7 @@ void adc_init () {
 int adc_read (uint8_t channel) {
     int i;
     uint8_t j;
-    
+
 //    PORTA.DIRCLR = (1<<c);
     ADCA_CTRLA = ADC_ENABLE_bm;
     ADCA_CTRLB = ADC_RESOLUTION_12BIT_gc;
@@ -43,7 +44,7 @@ int adc_read (uint8_t channel) {
 
     if (channel>10) {
         ADCA.CH0.CTRL = ADC_CH_INPUTMODE_INTERNAL_gc;	 // internal source
-        ADCA.CH0.MUXCTRL = (channel-10<<3);	 // Temp - Bandgap - Vcc - DAC
+        ADCA.CH0.MUXCTRL = ((channel-10)<<3);	 // Temp - Bandgap - Vcc - DAC
 //    ADCA.CH0.MUXCTRL = ADC_CH_MUXINT_SCALEDVCC_gc; // Vcc/10
 //    ADCA.CH0.MUXCTRL = ADC_CH_MUXINT_BANDGAP_gc;
 //    ADCA.CH0.MUXCTRL = ADC_CH_MUXINT_TEMP_gc;
@@ -53,7 +54,7 @@ int adc_read (uint8_t channel) {
 //    ADCA.CH0.MUXCTRL = c;	 // PORTA:2
 //    ADCA.CH0.MUXCTRL = 1;	 // Vin
     ADCA.CH0.MUXCTRL = (channel<<3);	 // Gnd
-
+    _delay_ms(1);
 //    ADCA.CH0.CTRL |= ADC_CH_START_bm; // start conversion on channel 0
     i=0;
     for (j=0; j<ADCA_AVGCOUNT; j++) {
