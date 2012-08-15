@@ -30,8 +30,8 @@ extern char *build;
 
 //FILE *s;
 uint8_t rot_decade=1;
-volatile int dac_v;
-volatile int dac_i;
+volatile int dac_v=100;
+volatile int dac_i=1000;
 volatile int adc_vmeter;
 volatile int adc_vin;
 volatile int adc_iuc;
@@ -62,6 +62,8 @@ int main () {
     sw_init();
     adc_init();
     dac_init();
+    dac_set(DAC_V,dac_v);
+    dac_set(DAC_I,dac_i);
 
     lcd_init();
 
@@ -81,10 +83,10 @@ int main () {
         t=util_wait_ms(100);
 //        _delay_ms(50);
 //        if (count==0) printf("[%05d:%05d] icount=%d w=%d r=%d \n",seconds,millisec,icount,rotbwptr,rotbrptr);
-        if (count==0) printf("[%05d:%05d %d] \n",seconds,millisec,t );
+        if (count==0) printf("[%04d:%03d %d] \n",seconds,millisec,t );
 
         lcd_gotoxy(0,12);
-        fprintf_P(&LCD,PSTR("DAC-Vout: %dV"),dac_v);
+        fprintf_P(&LCD,PSTR("DAC-Vout: %sV"),util_ifmt(dac_v,2));
         lcd_gotoxy(0,21);
         fprintf_P(&LCD,PSTR("DAC-Iout:  %dA"),dac_i);
 //        g_fill_rect(10,10,50,30);
@@ -116,11 +118,11 @@ int main () {
         fprintf_P(&LCD,PSTR("%dTemp"),adc_temp);
 
 //        char * util_ifmt(int, uint8_t
-        lcd_gotoxy(80,48);
-        fprintf_P(&LCD,PSTR("%s Vm"),util_ifmt(adc_vmeter,1));
+        lcd_gotoxy(80,57);
+        fprintf_P(&LCD,PSTR("%s Vm"),util_ifmt(adc_vmeter,2));
 
 
-        while (c = sw_read()) {
+        while ((c=sw_read())) {
             if (c==ROT_V_CW) {
                 dac_v += rot_decade;
                 if (dac_v>4000) dac_v = 4000;
@@ -136,13 +138,13 @@ int main () {
             if (c==ROT_I_CW) {
                 dac_i += rot_decade;
                 if (dac_i>4000) dac_i = 4000;
-                dac_set(0,dac_i);
+                dac_set(1,dac_i);
                 printf("main: set_dac(1,%d)\n",dac_i);
             }
             if (c==ROT_I_CCW) {
                 dac_i -= rot_decade;
                 if (dac_i<0) dac_i = 0;
-                dac_set(0,dac_i);
+                dac_set(1,dac_i);
                 printf("main: set_dac(1,%d)\n",dac_i);
             }
             if (c==BUT_V) {

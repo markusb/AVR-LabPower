@@ -56,16 +56,18 @@ ISR(TCC0_OVF_vect) {
 }
 
 // Format an integer
-char * ifmt_buf[20];
+char * ifmt_buf = "abcdefghijk";
 char * util_ifmt(int num, uint8_t dp) {
     uint8_t bp;
     bp=7;
     ifmt_buf[bp--]='\0';
-    while(dp) {
-        ifmt_buf[bp--] = 0x30+(num%10);
+    while(dp--) {
+        ifmt_buf[bp--] = (char)0x30+(num%10);
         num = num/10;
     }
     ifmt_buf[bp--]='.';
+//    return &ifmt_buf[0];
+    if(!num)ifmt_buf[bp--]='0';
     while(num){
         ifmt_buf[bp--] = 0x30+(num%10);
         num = num/10;
