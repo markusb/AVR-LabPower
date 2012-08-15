@@ -1,0 +1,70 @@
+<h1>Microcontroller based Lab Power-Supply</h1>
+<p>Inspired by the Dave's EEVBlog power-supply series, see www.eevblog.com
+<h2>Basic Premises</h2>
+<p>Modular construction: If you don't need all parts/gadgets you can just build the parts you need and leave the rest off. For example you can forego the switching pre-regulator or the ucurrent uamp measurement circuit.
+<p>The construction is mixed, mostly SMD with some trough-hole. Some parts are through-hole, especially if variants are used. The micro and the op-amp are SMD, because they are not available in through-hole packages.
+<p>The power supply does not connect directly to mains power, but uses a standard power supply as input. This allows us to skip all mains safety related questions as those are cared for by the upstream mains power supply. The power supply input is 12V to 20V. There are plenty of laptop power supplies who supply DC power in this range.
+<h3>Modules:</h3>
+<ul>
+<li>Linear power regulator, takes two input voltages (vset/iset) and translates it into 0-40V/0-4A output with 10mV/1mA resolution. This can me modified, for example to 0-10V/0-1A with 2.5mV resolution. We use the LT3080 (1 amp) or LT3083 (3 amps), for the regulation. These regulators allow to go down to zero volt/amp. The target precision is 1%.
+<li>Switching pre-regulator, takes 12-20V input and translates this into 2-32V. It follows the output voltage, reducing the drop-out voltage of the linear regulator to 2V. This reduces cooling requirements for the linear regulator a lot. It also allows to use any available DC power from a 12V battery to a laptop power supply and get up to 30V output.
+<li>Microcontroller based. The micro (AVR atxmega32A3U) has an USB interface, drives a graphical LCD display and reads rotary switches. It generates the 0-1V ouput (via DAC) used as regulator input. If desired the microcontroller can be replaced with two potentiometers and a 1V reference. The USB interface does not provide galvanic isolation.
+<li>High precision reference. If a better precision than the built-in 0.5% reference of the microcontroller is desired a separate 1V reference can be added. In this case the relevant resistors in the circuit must be of high precision too.
+<li>uCurrent small current measurement device. This is a small shunt with amplifier to measure small currents (uAmps).
+<li>Bluetooth interface. There is a slot to add a simple bluetooth serial interface module. This allows to interface the power supply with a computer wirelessly (galvanic isolation).
+<li>Simple Volmeter. A spare ADC channel is wired to provide a simple 0-40V voltmeter (10mV resolution). Signal ground is the power supply ground.
+</ul>
+<h3>Specifications:</h3>
+<ul>
+<li>Output:
+<ul>
+<li>0-30 V
+<li>0-3 Amps (LT3083), 0-1Amps (LT3080)
+<li>0-30V in 10mV steps
+<li>0-3A in 1mA steps
+</ul>
+<li>Input :
+<ul>
+<li>10-20 V
+</ul>
+<li>Hybrid regulation:
+<ul>
+<li>Switching regulator stage -> low power dissipation
+<li>Linear regulator -> low noise
+<br>LT3083 or LT3080
+</ul>
+<li>Microcontroller controlled (xmega32A4U)
+<li>Computer interface (USB, Bluetooth)
+<li>Graphical LCD (128x65)
+<li>Optional components/modules:
+<ul>
+<li>uCurrent
+<li>Bluetooth
+<li>1 Amp version by using a LT3080
+<li>Switching preregulator
+</ul>
+<li>
+</ul>
+<h3>User Interface</h3>
+<p>User interface elements
+<ul>
+<li>Graphical LCD display
+<li>Rotary knob to regulate voltage
+<br>One or two rotary knobs ?
+<li>'Menu' and 'Cancel' button
+<li>Speaker on port with timer output
+</ul>
+<h3>Open Issues, Caveats and Enhancements</h3>
+<ul>
+<li>Protection against user error on the output side:
+<ul>
+<li>Input voltage connected when power supply is off
+<li>Reverse polarity input voltage<br>-> Diode and PPTC
+<li>High input voltage
+</ul>
+<li>Protection against user error on the input side, reverse polarity protection<br>P-MOSFET
+<li>USB interface not isolated
+<li>USB ground not equal to ouput ground due to ucurrent device in the return path
+<li>Possibility to use USB as supply voltage (with reduced power)
+</ul>
+<p>Markus

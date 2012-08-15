@@ -130,3 +130,6 @@ $(GDBINITFILE): $(PRG).hex
 	@echo
 	@echo "Use 'avr-gdb -x $(GDBINITFILE)'"
 
+grep:
+	@echo grep  /usr/local/avr/avr/include/avr/iox16a4u.h
+

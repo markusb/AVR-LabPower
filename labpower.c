@@ -28,8 +28,8 @@ extern int seconds;
 extern int millisec;
 extern char *build;
 
-//FILE *s;
-uint8_t rot_decade=1;
+uint8_t rot_decade=10;
+
 volatile int dac_v=100;
 volatile int dac_i=1000;
 volatile int adc_vmeter;
@@ -96,8 +96,8 @@ int main () {
 
         adc_vmeter = adc_read(1);
         adc_vin = adc_read(4);
-//        adc_iuc = adc_read(5);
-//        adc_iout = adc_read(6);
+        adc_iuc = adc_read(5);
+        adc_iout = adc_read(6);
         adc_vout = adc_read(7);
         adc_temp = adc_read(10);
         adc_vcc  = adc_read(12);
@@ -113,7 +113,7 @@ int main () {
         lcd_gotoxy(0,30);
         fprintf_P(&LCD,PSTR("Meter:"));
         lcd_gotoxy(52,30);
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vmeter,2));
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vmeter-(adc_vmeter/11)-(adc_vmeter/45),2));
 
         lcd_gotoxy(0,39);
         fprintf_P(&LCD,PSTR("Vin:"));
@@ -125,7 +125,8 @@ int main () {
         lcd_gotoxy(0,48);
         fprintf_P(&LCD,PSTR("Vcc:"));
         lcd_gotoxy(52,48);
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vcc*25/10,2));
+//        adc_vcc = adc_vcc*2+(adc_vcc/2);
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vcc>>2,2));
         lcd_gotoxy(90,48);
         fprintf_P(&LCD,PSTR("%sT"),util_ifmt(adc_temp,2));
 
