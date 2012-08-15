@@ -125,6 +125,12 @@ void lcd_setbacklight (uint8_t s) {
 //    else PORTC.OUTCLR=PIN1_bm;
 }
 
+void lcd_setcontrast (uint8_t c) {
+    if ((c<4)||(c>60)) return;
+    lcd_sendcmd(LCD_ST7565R_CMD_CONTRAST);
+    lcd_sendcmd(c);
+}
+
 void lcd_clearscreen () {
     unsigned char p,x;
     lcd_sendcmd('\x40');  // Set start line

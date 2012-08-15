@@ -30,6 +30,8 @@ extern char *build;
 
 uint8_t rot_decade=10;
 
+volatile uint8_t lcd_contrast=20;
+
 volatile int dac_v=100;
 volatile int dac_i=1000;
 volatile int adc_vmeter;
@@ -130,6 +132,9 @@ int main () {
         lcd_gotoxy(90,48);
         fprintf_P(&LCD,PSTR("%sT"),util_ifmt(adc_temp,2));
 
+        lcd_gotoxy(0,57);
+        fprintf_P(&LCD,PSTR("Contrast: %d"),lcd_contrast);
+
         while ((c=sw_read())) {
             if (c==ROT_V_CW) {
                 dac_v += rot_decade;
@@ -144,12 +149,14 @@ int main () {
                 printf("main: set_dac(0,%d)\n",dac_v);
             }
             if (c==ROT_I_CW) {
+                lcd_contrast++;
                 dac_i += rot_decade;
                 if (dac_i>4000) dac_i = 4000;
                 dac_set(1,dac_i);
                 printf("main: set_dac(1,%d)\n",dac_i);
             }
             if (c==ROT_I_CCW) {
+                lcd_contrast--;
                 dac_i -= rot_decade;
                 if (dac_i<0) dac_i = 0;
                 dac_set(1,dac_i);
@@ -181,6 +188,7 @@ int main () {
 //        fprintf_P(&LCD,PSTR("Key %d "),c);
 
         disp_send_frame();
+        lcd_setcontrast(lcd_contrast);
 
         // vin = 500-2000 -> 1500
         // vin = 500 -> setbacklight=200
