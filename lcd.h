@@ -32,7 +32,7 @@
 #define LCD_ST7565R_CMD_NOP '\xE3'
 
 void lcd_init ();
-void lcd_setbacklight (int);
+void lcd_setbacklight (uint8_t);
 void util_clockinit ();
 void lcd_clearscreen ();
 void lcd_sendcmd (unsigned char);

@@ -118,8 +118,8 @@ void lcd_init () {
 /***********************
 * Set backlight strength
 */
-void lcd_setbacklight (int s) {
-    TCC0_CCB = s * 128;
+void lcd_setbacklight (uint8_t s) {
+    TCC0_CCB = s * 125;
 //    PORTC.DIRSET = PIN1_bm;
 //    if (s) PORTC.OUTSET=PIN1_bm;
 //    else PORTC.OUTCLR=PIN1_bm;

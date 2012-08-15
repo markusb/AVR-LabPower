@@ -104,8 +104,7 @@ void util_init () {
 
 void util_ledonoff (unsigned char s) {
 //    PORTC.DIRSET = PIN0_bm;
-    TCC0_CCA = s * 128;
+    TCC0_CCA = s * 125;
 //    if (s<100) PORTC.OUTSET=PIN0_bm;
 //    else PORTC.OUTCLR=PIN0_bm;
 }
-

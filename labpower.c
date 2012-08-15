@@ -57,7 +57,7 @@ int main () {
     // Set up LEDs with PWM
     util_init();
     util_ledonoff(20);
-    lcd_setbacklight(200);
+    lcd_setbacklight(100);
 
     sw_init();
     adc_init();
@@ -86,9 +86,12 @@ int main () {
         if (count==0) printf("[%04d:%03d %d] \n",seconds,millisec,t );
 
         lcd_gotoxy(0,12);
-        fprintf_P(&LCD,PSTR("DAC-Vout: %sV"),util_ifmt(dac_v,2));
-        lcd_gotoxy(0,21);
-        fprintf_P(&LCD,PSTR("DAC-Iout:  %dA"),dac_i);
+        fprintf_P(&LCD,PSTR("DAC:"));
+        lcd_gotoxy(52,12);
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(dac_v,2));
+        lcd_gotoxy(90,12);
+        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(dac_i,3));
+//        fprintf_P(&LCD,PSTR("DAC-Iout:  %dA"),dac_i);
 //        g_fill_rect(10,10,50,30);
 
         adc_vmeter = adc_read(1);
@@ -100,27 +103,31 @@ int main () {
         adc_vcc  = adc_read(12);
         adc_dac0 = adc_read(13);
 
+        lcd_gotoxy(0,21);
+        fprintf_P(&LCD,PSTR("ADC:"));
+        lcd_gotoxy(52,21);
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vout,2));
+        lcd_gotoxy(90,21);
+        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(adc_iout,3));
+
         lcd_gotoxy(0,30);
-        fprintf_P(&LCD,PSTR("Vmeter %dV"),adc_vmeter);
+        fprintf_P(&LCD,PSTR("Meter:"));
+        lcd_gotoxy(52,30);
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vmeter,2));
+
         lcd_gotoxy(0,39);
-        fprintf_P(&LCD,PSTR("Vin %dV"),adc_vin);
+        fprintf_P(&LCD,PSTR("Vin:"));
+        lcd_gotoxy(52,39);
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vin,2));
+        lcd_gotoxy(90,39);
+        fprintf_P(&LCD,PSTR("%sAuc"),util_ifmt(adc_iuc,2));
+
         lcd_gotoxy(0,48);
-        fprintf_P(&LCD,PSTR("Iuc %dV"),adc_iuc);
-        lcd_gotoxy(0,57);
-        fprintf_P(&LCD,PSTR("Iout %dV"),adc_iout);
-        lcd_gotoxy(80,12);
-        fprintf_P(&LCD,PSTR("%dVout"),adc_vout);
-        lcd_gotoxy(80,21);
-        fprintf_P(&LCD,PSTR("%dVdac"),adc_dac0);
-        lcd_gotoxy(80,30);
-        fprintf_P(&LCD,PSTR("%dVcc"),adc_vcc);
-        lcd_gotoxy(80,39);
-        fprintf_P(&LCD,PSTR("%dTemp"),adc_temp);
-
-//        char * util_ifmt(int, uint8_t
-        lcd_gotoxy(80,57);
-        fprintf_P(&LCD,PSTR("%s Vm"),util_ifmt(adc_vmeter,2));
-
+        fprintf_P(&LCD,PSTR("Vcc:"));
+        lcd_gotoxy(52,48);
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vcc,2));
+        lcd_gotoxy(90,48);
+        fprintf_P(&LCD,PSTR("%sT"),util_ifmt(adc_temp,2));
 
         while ((c=sw_read())) {
             if (c==ROT_V_CW) {
@@ -173,6 +180,11 @@ int main () {
 //        fprintf_P(&LCD,PSTR("Key %d "),c);
 
         disp_send_frame();
+
+        // vin = 500-2000 -> 1500
+        // vin = 500 -> setbacklight=200
+        // vin = 2000 -> setbacklight=50
+        lcd_setbacklight(250-((adc_vin-500)/10));
     }
 }
 
