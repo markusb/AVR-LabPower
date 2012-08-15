@@ -125,7 +125,7 @@ int main () {
         lcd_gotoxy(0,48);
         fprintf_P(&LCD,PSTR("Vcc:"));
         lcd_gotoxy(52,48);
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vcc,2));
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vcc*25/10,2));
         lcd_gotoxy(90,48);
         fprintf_P(&LCD,PSTR("%sT"),util_ifmt(adc_temp,2));
 
