@@ -13,6 +13,9 @@
 #include "switch.h"
 #include "rotary.h"
 
+extern int seconds;
+extern int millisec;
+
 volatile int icount = 0;
 
 static uint8_t lastc;
