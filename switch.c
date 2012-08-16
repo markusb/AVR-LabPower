@@ -16,6 +16,9 @@
 extern int seconds;
 extern int millisec;
 
+int but_sec;
+int but_ms;
+
 volatile int icount = 0;
 
 static uint8_t lastc;
@@ -72,25 +75,45 @@ ISR(PORTD_INT0_vect) {
    	icount++;
 }
 
+/*
+*  Read the input switches
+*  Rotary encoders are read in an interrupt routine and buffered
+*  Pushbutton switches are polled and have a long-press function
+*/
 uint8_t sw_read () {
     uint8_t c;
+    int bdelta;
+
+    // Check for rotary input in the buffer
     if (rotbrptr != rotbwptr) {
         cli();
         c = rotbuf[rotbrptr++];
         if (rotbrptr>=32) rotbrptr=0;
         sei();
-//        printf("sw_read: rot: p=%d c=%d\n",rotbrptr,c);
         return c;
     }
-
+    c=0;
    	if      (!(PORTD.IN & BUT_V_PIN))  { c=BUT_V;  }
    	else if (!(PORTD.IN & BUT_I_PIN))  { c=BUT_I;  }
 //   	else if (!(PORTC.IN & BUT_S1_PIN)) { c=BUT_S1; }
-   	else if (!(PORTB.IN & BUT_S2_PIN)) { c=BUT_S2; }
-   	else if (!(PORTB.IN & BUT_S3_PIN)) { c=BUT_S3; }
-   	else { c=0; lastc=0; }
+//   	else if (!(PORTB.IN & BUT_S2_PIN)) { c=BUT_S2; }
+//   	else if (!(PORTB.IN & BUT_S3_PIN)) { c=BUT_S3; }
+   	else { c=0; }
 //   	printf("sw_read: c=%d lastc=%d\n",c,lastc);
+
+    if ((c==0)&&(lastc>0)) {    // Button released
+        bdelta=(seconds-but_sec)*1000+(millisec-but_ms);
+        c=c+BUT_SHORT;
+        printf("sw_read: button %x released delta=%d\n",lastc,bdelta);
+    }
+
    	if (c==lastc) return 0;
    	lastc = c;
+    printf("sw_read: button %x pressed\n",c);
+
+    but_sec = seconds;
+    but_ms = millisec;
+
    	return c;
 }
+
