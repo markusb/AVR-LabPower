@@ -29,6 +29,7 @@
 #define LCD_SCL PIN7_bm
 #define LCD_SI PIN5_bm
 
+uint8_t lcd_contrast=LCD_ST7565R_DEFAULT_CONTRAST;
 FILE LCD = FDEV_SETUP_STREAM (lcd_putc, NULL, _FDEV_SETUP_WRITE);
 
 /*
@@ -83,8 +84,7 @@ void lcd_init () {
     lcd_sendcmd('\x26');
 //    lcd_sendcmd('\x00');
 //    lcd_sendcmd('\x10');
-    lcd_sendcmd(LCD_ST7565R_CMD_CONTRAST);
-    lcd_sendcmd(20);
+    lcd_setcontrast(lcd_contrast);
     lcd_sendcmd(LCD_ST7565R_CMD_ON);
 
     // A0 - ADC select - Normal

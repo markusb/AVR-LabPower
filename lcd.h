@@ -30,6 +30,7 @@
 #define LCD_ST7565R_CMD_RMW_END '\xEE'
 #define LCD_ST7565R_CMD_RESET '\xE2'
 #define LCD_ST7565R_CMD_NOP '\xE3'
+#define LCD_ST7565R_DEFAULT_CONTRAST 18
 
 void lcd_init ();
 void lcd_setbacklight (uint8_t);

@@ -1,5 +1,11 @@
-
-// Display driver for DOGM128
+/*
+*
+* Graphic display driver for LCD with ST7565 controller
+*
+* Originally by Sebastian, see http://www.mikrocontroller.net/topic/75589
+*
+* Reorganized and modified by Markus Baertschi
+*/
 
 #include <stdlib.h>
 #include <avr/io.h>

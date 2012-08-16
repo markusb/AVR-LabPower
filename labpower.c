@@ -30,7 +30,7 @@ extern char *build;
 
 uint8_t rot_decade=10;
 
-volatile uint8_t lcd_contrast=18;
+extern uint8_t lcd_contrast=LCD_ST7565R_DEFAULT_CONTRAST;
 
 volatile int dac_v=100;
 volatile int dac_i=1000;
@@ -72,8 +72,6 @@ int main () {
     while (1) {
         count++;
 
-        disp_clear_dont_refresh();
-        lcd_gotoxy(0,1);
         fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
 
         if (count>10) {
@@ -83,9 +81,10 @@ int main () {
             util_ledonoff(150);
         }
         t=util_wait_ms(100);
-//        _delay_ms(50);
-//        if (count==0) printf("[%05d:%05d] icount=%d w=%d r=%d \n",seconds,millisec,icount,rotbwptr,rotbrptr);
         if (count==0) printf("[%04d:%03d %d] \n",seconds,millisec,t );
+
+        disp_clear_dont_refresh();
+        lcd_gotoxy(0,1);
 
         lcd_gotoxy(0,12);
         fprintf_P(&LCD,PSTR("DAC:"));
@@ -93,8 +92,6 @@ int main () {
         fprintf_P(&LCD,PSTR("%sV"),util_ifmt(dac_v,2));
         lcd_gotoxy(90,12);
         fprintf_P(&LCD,PSTR("%sA"),util_ifmt(dac_i,3));
-//        fprintf_P(&LCD,PSTR("DAC-Iout:  %dA"),dac_i);
-//        g_fill_rect(10,10,50,30);
 
         adc_vmeter = adc_read(1);
         adc_vin = adc_read(4);
@@ -127,13 +124,10 @@ int main () {
         lcd_gotoxy(0,48);
         fprintf_P(&LCD,PSTR("Vcc:"));
         lcd_gotoxy(52,48);
-//        adc_vcc = adc_vcc*2+(adc_vcc/2);
+
         fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vcc>>2,2));
         lcd_gotoxy(90,48);
         fprintf_P(&LCD,PSTR("%sT"),util_ifmt(adc_temp,2));
-
-//        lcd_gotoxy(0,57);
-//        fprintf_P(&LCD,PSTR("Contrast: %d"),lcd_contrast);
 
         while ((c=sw_read())) {
             if (c==ROT_V_CW) {
@@ -184,15 +178,11 @@ int main () {
                 printf("main: but_s3\n");
             }
         }
-//        lcd_gotoxy(60,48);
-//        fprintf_P(&LCD,PSTR("Key %d "),c);
 
         disp_send_frame();
+
         lcd_setcontrast(lcd_contrast);
 
-        // vin = 500-2000 -> 1500
-        // vin = 500 -> setbacklight=200
-        // vin = 2000 -> setbacklight=50
         lcd_setbacklight(250-((adc_vin-500)/10));
     }
 }
