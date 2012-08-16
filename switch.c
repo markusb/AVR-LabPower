@@ -119,11 +119,12 @@ uint8_t sw_read () {
     // depending on the press duration
     if ((c==0)&&(lastc>0)) {
         bdelta=(util_sec-but_sec)*1000+(util_ms-but_ms);
-        printf("sw_read: button %x released delta=%d\n",lastc,bdelta);
         if (bdelta>BUT_LONGPRESS_MS) {
-            c=c+BUT_LONG;
+            c=lastc+BUT_LONG;
+            printf("sw_read: button %x long press delta=%d\n",c,bdelta);
         } else {
-            c=c+BUT_SHORT;
+            c=lastc+BUT_SHORT;
+            printf("sw_read: button %x short press delta=%d\n",c,bdelta);
         }
         lastc=0;
         return c;

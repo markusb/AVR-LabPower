@@ -64,10 +64,10 @@ int main () {
 
     while (1) {
         count++;
-        if (count>10) {
+        if (count>=10) {
             util_ledonoff(20);
             count=0;
-        } else if (count>9) {
+        } else if (count>=9) {
             util_ledonoff(150);
         }
         t=util_wait_ms(100);

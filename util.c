@@ -66,14 +66,15 @@ ISR(TCC0_OVF_vect) {
 // ifmt(12345,3) -> "12.345"
 // ifmt(12,2)    -> "0.12"
 */
-#define IFMT_BUFLEN 10
+#define IFMT_BUFLEN 8
 char ifmt_buf[IFMT_BUFLEN]; // = "abcdefghijk";
+//char * ifmt_buf = "abcdefghijk";
 char * util_ifmt(int num, uint8_t dp) {
     uint8_t bp;
 
     // Initialize and start with a \0 at the end of the string
     bp=IFMT_BUFLEN-1;
-    ifmt_buf[bp]='\0';
+    ifmt_buf[bp--]='\0';
     // Add the digits after the decimal point
     while(dp--) {
         ifmt_buf[bp--] = (char)0x30+(num%10);
