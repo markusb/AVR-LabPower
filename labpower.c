@@ -47,7 +47,7 @@ int main () {
     uart_init();
     stdout = &mystdout;
     util_clockinit();
-    printf("MLP3003 V%s, build %s initializing\n",FWVERSION,build);
+    printf("MLP3003 V%s, build %s initializing...\n",FWVERSION,build);
 
     // Set up LEDs with PWM
     util_init();
@@ -71,7 +71,7 @@ int main () {
             util_ledonoff(150);
         }
         t=util_wait_ms(100);
-        if (count==0) printf("[%04d:%03d %d] \n",util_sec,util_ms,t);
+        if (count==0) printf("[%04d:%03d] Build:%s \n",util_sec,util_ms,build);
 
         adc_vmeter = adc_read(1);
         adc_vin = adc_read(4);
@@ -89,8 +89,11 @@ int main () {
 
         // Set the LCD backlight brightness according to the input voltage
         lcd_setbacklight(250-((adc_vin-500)/10));
+
+        util_eeprom_autosave();
     }
 }
+
 
 #define BRI_STEP 10
 #define BRI_MAX 250

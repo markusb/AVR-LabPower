@@ -12,8 +12,13 @@
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
+#include "util.h"
+#include "eeprom.h"
 #include "lcd.h"
-//#include "util.h"
+
+extern int dac_v;
+extern int dac_i;
 
 volatile int util_ms;
 volatile int util_sec;
@@ -90,6 +95,35 @@ char * util_ifmt(int num, uint8_t dp) {
         num = num/10;
     }
     return &ifmt_buf[++bp];
+}
+
+int ee_v,ee_i,as_ts;
+void util_eeprom_autosave() {
+    if ((ee_v!=dac_v)||(ee_i!=dac_i)) {     // v or i has changed
+        if (as_ts==0) {                     // start timeout
+            as_ts = util_sec;               // set timestamp
+        } else {
+            if (util_sec>(as_ts+AS_TIMEOUT)) {  // Check for timeout
+                ee_v = dac_v;
+                ee_i = dac_i;
+                eeprom_write_word(&ee_saved_v,dac_v);
+                eeprom_write_word(&ee_saved_i,dac_i);
+                eeprom_write_word(&ee_checksum,EE_CHECKSUM);
+                printf("eeprom_autosave: writing to eeprom\n");
+                as_ts=0;
+            }
+        }
+    }
+}
+
+void util_eeprom_restore() {
+    int i;
+
+    i  = eeprom_read_word(&ee_checksum);
+    if (i!=EE_CHECKSUM) return;
+
+    dac_v = eeprom_read_word(&ee_saved_v);
+    dac_i = eeprom_read_word(&ee_saved_i);
 }
 
 // Wait until the next 100ms tick and return the number of ms waited
