@@ -36,6 +36,9 @@ volatile int adc_dac0;
 volatile int adc_temp;
 volatile int adc_vcc;
 
+int mem_v[4];
+int mem_i[4];
+
 int main () {
     int count = 0;
 //    unsigned char c,d;
@@ -51,6 +54,7 @@ int main () {
 
     // Set up LEDs with PWM
     util_init();
+    util_eeprom_restore();
     util_ledonoff(20);
     lcd_setbacklight(100);
 

@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <avr/pgmspace.h>
+#include <avr/eeprom.h>
 #include <util/delay.h>
 #include "ui.h"
 #include "lcd.h"
@@ -18,6 +19,7 @@
 #include "labpower.h"
 #include "util.h"
 #include "dac.h"
+#include "eeprom.h"
 
 extern char *build;
 extern uint8_t lcd_contrast;
@@ -32,6 +34,8 @@ extern int adc_vout;
 extern int adc_dac0;
 extern int adc_temp;
 extern int adc_vcc;
+extern int mem_v[];
+extern int mem_i[];
 
 uint8_t rot_decade=10;
 
@@ -217,8 +221,8 @@ void ui_screen_memory () {
     for (c=0; c<=MEMORY_CH_MAX; c++) {
         lcd_gotoxy(8,12+(c*9));
         fprintf_P(&LCD,PSTR("Mem%d: "),c);
-        fprintf_P(&LCD,PSTR("%sV "),util_ifmt(c*300,2));
-        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(c*500,3));
+        fprintf_P(&LCD,PSTR("%sV "),util_ifmt(mem_v[ui_memory_ch],2));
+        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(mem_i[ui_memory_ch],3));
     }
 
     lcd_gotoxy(0,57);
@@ -235,15 +239,16 @@ void ui_screen_memory () {
             if (ui_memory_ch>0) ui_memory_ch--;
         }
         if (c==BUT_V_SHORT) { // Recall
-            dac_v=ui_memory_ch*300;
-            dac_i=ui_memory_ch*500;
+            dac_v=mem_v[ui_memory_ch];
+            dac_i=mem_i[ui_memory_ch];
             ui_screen=UI_SCN_NORMAL;
         }
         if (c==BUT_V_LONG) { // Save
-            dac_v=ui_memory_ch*300;
-            dac_i=ui_memory_ch*500;
+            mem_v[ui_memory_ch]=dac_v;
+            mem_i[ui_memory_ch]=dac_i;
+            eeprom_write_word(&ee_mem_v+ui_memory_ch*2,mem_v[ui_memory_ch]);
+            eeprom_write_word(&ee_mem_i+ui_memory_ch*2,mem_v[ui_memory_ch]);
             ui_screen=UI_SCN_MESSAGE;
-//            ui_msgbuf1[0]='\0';
             strcpy_PF(ui_msgbuf1,PSTR("Saving to memory"));
             ui_msgtimeout=2000;
         }
@@ -252,6 +257,9 @@ void ui_screen_memory () {
         }
     }
 }
+//    eeprom_read_block(mem_v,&ee_mem_v,sizeof(int)*MEMORY_CH_MAX);
+//    eeprom_read_block(mem_i,&ee_mem_i,sizeof(int)*MEMORY_CH_MAX);
+//                eeprom_write_word(&ee_saved_v,dac_v);
 
 void ui_screen_error () {
     uint8_t c;

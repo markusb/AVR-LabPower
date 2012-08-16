@@ -14,11 +14,14 @@
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
 #include "util.h"
+#include "labpower.h"
 #include "eeprom.h"
 #include "lcd.h"
 
 extern int dac_v;
 extern int dac_i;
+extern int mem_v[];
+extern int mem_i[];
 
 volatile int util_ms;
 volatile int util_sec;
@@ -106,9 +109,9 @@ void util_eeprom_autosave() {
             if (util_sec>(as_ts+AS_TIMEOUT)) {  // Check for timeout
                 ee_v = dac_v;
                 ee_i = dac_i;
+                eeprom_write_word(&ee_checksum,EE_CHECKSUM);
                 eeprom_write_word(&ee_saved_v,dac_v);
                 eeprom_write_word(&ee_saved_i,dac_i);
-                eeprom_write_word(&ee_checksum,EE_CHECKSUM);
                 printf("eeprom_autosave: writing to eeprom\n");
                 as_ts=0;
             }
@@ -119,11 +122,26 @@ void util_eeprom_autosave() {
 void util_eeprom_restore() {
     int i;
 
+    printf("eeprom_restore: restoring from eeprom\n");
+
     i  = eeprom_read_word(&ee_checksum);
-    if (i!=EE_CHECKSUM) return;
+//    i  = eeprom_read_word(&ee_checksum+0x2000);
+//    i  = ee_checksum;
+    if (i!=EE_CHECKSUM) {
+        printf("eeprom_restore: checksum failure c=%d, expected: %d, addr: %d\n",i,EE_CHECKSUM,ee_checksum);
+        return;
+    }
 
     dac_v = eeprom_read_word(&ee_saved_v);
     dac_i = eeprom_read_word(&ee_saved_i);
+
+    eeprom_read_block(mem_v,&ee_mem_v,sizeof(int)*MEMORY_CH_MAX);
+    eeprom_read_block(mem_i,&ee_mem_i,sizeof(int)*MEMORY_CH_MAX);
+
+//    dac_v = eeprom_read_word(&ee_saved_v+0x2000);
+//    dac_i = eeprom_read_word(&ee_saved_i+0x2000);
+//    dac_v = ee_saved_v;
+//    dac_i = ee_saved_i;
 }
 
 // Wait until the next 100ms tick and return the number of ms waited
@@ -154,6 +172,9 @@ void util_init () {
     PORTC.DIRSET = PIN6_bm;
     PORTB.DIRSET = PIN1_bm;
     PORTB.OUTSET = PIN1_bm;
+
+    ee_v = dac_v;
+    ee_i = dac_i;
 }
 
 void util_ledonoff (unsigned char s) {
