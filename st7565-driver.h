@@ -12,7 +12,7 @@
 #define DISP_HEIGHT  64L    // 65 lines broken !
 #define DISP_DEPTH   1		// monochrome
 //#define DISP_RAM_SIZE 1152	// 9 x 128
-#define DISP_RAM_SIZE 1024	// 9 x 128
+#define DISP_RAM_SIZE 1024	// 8 x 128
 
 // Hardware pin definitions
 #define CS_PORT  PORTE.OUT

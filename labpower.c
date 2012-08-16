@@ -20,17 +20,13 @@
 #include "st7565.h"
 #include "ui.h"
 
-// for debugging purposes
-//extern int icount;
-//extern uint8_t rotbwptr;
-//extern uint8_t rotbrptr;
 
 extern char *build;
 
 extern uint8_t lcd_contrast;
 
-volatile int dac_v=100;
-volatile int dac_i=1000;
+volatile int dac_v=330;
+volatile int dac_i=500;
 volatile int adc_vmeter;
 volatile int adc_vin;
 volatile int adc_iuc;
@@ -74,8 +70,7 @@ int main () {
         } else if (count>9) {
             util_ledonoff(150);
         }
-//        _delay_ms(3);
-//        t=util_wait_ms(100);
+        t=util_wait_ms(100);
         if (count==0) printf("[%04d:%03d %d] \n",util_sec,util_ms,t);
 
         adc_vmeter = adc_read(1);
@@ -87,6 +82,7 @@ int main () {
         adc_vcc  = adc_read(12);
         adc_dac0 = adc_read(13);
 
+//        _delay_ms(5);
         ui_display();
 
         lcd_setcontrast(lcd_contrast);

@@ -30,5 +30,7 @@
 #define BUT_S2_LONG 0x34
 #define BUT_S3_LONG 0x35
 
+#define BUT_LONGPRESS_MS 1500
+
 void sw_init();
 uint8_t sw_read();

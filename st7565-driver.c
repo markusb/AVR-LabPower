@@ -115,7 +115,7 @@ void disp_init()
 void disp_send_frame()
 {
 	uint8_t page;
-	for (page = 0; page < 9; page++)
+	for (page = 0; page < 8; page++)
 	{
 		dogm_send_command(0xB0 + page); //Set page address to <page>
 		dogm_send_command(0x10 + 0); //Set column address to 0 (4 MSBs)
