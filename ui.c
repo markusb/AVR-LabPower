@@ -221,8 +221,8 @@ void ui_screen_memory () {
     for (c=0; c<=MEMORY_CH_MAX; c++) {
         lcd_gotoxy(8,12+(c*9));
         fprintf_P(&LCD,PSTR("Mem%d: "),c);
-        fprintf_P(&LCD,PSTR("%sV "),util_ifmt(mem_v[ui_memory_ch],2));
-        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(mem_i[ui_memory_ch],3));
+        fprintf_P(&LCD,PSTR("%sV "),util_ifmt(mem_v[c],2));
+        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(mem_i[c],3));
     }
 
     lcd_gotoxy(0,57);
@@ -246,8 +246,8 @@ void ui_screen_memory () {
         if (c==BUT_V_LONG) { // Save
             mem_v[ui_memory_ch]=dac_v;
             mem_i[ui_memory_ch]=dac_i;
-            eeprom_write_word(&ee_mem_v+ui_memory_ch*2,mem_v[ui_memory_ch]);
-            eeprom_write_word(&ee_mem_i+ui_memory_ch*2,mem_v[ui_memory_ch]);
+            eeprom_write_word(&ee_mem_v[ui_memory_ch],mem_v[ui_memory_ch]);
+            eeprom_write_word(&ee_mem_i[ui_memory_ch],mem_v[ui_memory_ch]);
             ui_screen=UI_SCN_MESSAGE;
             strcpy_PF(ui_msgbuf1,PSTR("Saving to memory"));
             ui_msgtimeout=2000;

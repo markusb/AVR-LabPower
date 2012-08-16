@@ -3,7 +3,7 @@
 #
 
 PRG            = labpower
-OBJ            = labpower.o lcd.o switch.o util.o uart.o adc.o dac.o st7565-driver.o st7565-graphics.o build.o ui.o
+OBJ            = labpower.o lcd.o switch.o util.o uart.o adc.o dac.o st7565-driver.o st7565-graphics.o build.o ui.o eeprom.o
 PROGRAMMER     = dragon_pdi
 PORT           = usb
 #MCU_TARGET     = atxmega32a4u
