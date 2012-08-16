@@ -12,11 +12,16 @@
 #define ROT_V_CCW   2
 #define ROT_I_CW    3
 #define ROT_I_CCW   4
-#define BUT_V       5
-#define BUT_I       6
-#define BUT_S1      7
-#define BUT_S2      8
-#define BUT_S3      9
+#define BUT_V       11
+#define BUT_I       12
+#define BUT_S1      13
+#define BUT_S2      14
+#define BUT_S3      15
+#define BUT_V_LONG  21
+#define BUT_I_LONG  22
+#define BUT_S1_LONG 23
+#define BUT_S2_LONG 24
+#define BUT_S3_LONG 25
 
 void sw_init();
 uint8_t sw_read();

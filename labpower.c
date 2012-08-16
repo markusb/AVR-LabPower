@@ -87,7 +87,8 @@ int main () {
         adc_temp = adc_read(10);
         adc_vcc  = adc_read(12);
         adc_dac0 = adc_read(13);
-        disp_clear_dont_refresh();
+
+        ui_display();
 
 /*
         lcd_gotoxy(0,1);
