@@ -18,19 +18,18 @@
 #include "switch.h"
 #include "labpower.h"
 #include "st7565.h"
+#include "ui.h"
 
 // for debugging purposes
-extern int icount;
-extern uint8_t rotbwptr;
-extern uint8_t rotbrptr;
+//extern int icount;
+//extern uint8_t rotbwptr;
+//extern uint8_t rotbrptr;
 
 extern int seconds;
 extern int millisec;
 extern char *build;
 
-uint8_t rot_decade=10;
-
-extern uint8_t lcd_contrast=LCD_ST7565R_DEFAULT_CONTRAST;
+extern uint8_t lcd_contrast;
 
 volatile int dac_v=100;
 volatile int dac_i=1000;
@@ -46,7 +45,7 @@ volatile int adc_vcc;
 int main () {
     int count = 0;
     unsigned char c,d;
-    uint8_t t;
+    int t;
 
     int tempref = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE0)) +
                   util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE1)) * 256;
@@ -71,9 +70,6 @@ int main () {
 
     while (1) {
         count++;
-
-        fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
-
         if (count>10) {
             util_ledonoff(20);
             count=0;
@@ -83,16 +79,6 @@ int main () {
         t=util_wait_ms(100);
         if (count==0) printf("[%04d:%03d %d] \n",seconds,millisec,t );
 
-        disp_clear_dont_refresh();
-        lcd_gotoxy(0,1);
-
-        lcd_gotoxy(0,12);
-        fprintf_P(&LCD,PSTR("DAC:"));
-        lcd_gotoxy(52,12);
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(dac_v,2));
-        lcd_gotoxy(90,12);
-        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(dac_i,3));
-
         adc_vmeter = adc_read(1);
         adc_vin = adc_read(4);
         adc_iuc = adc_read(5);
@@ -101,6 +87,19 @@ int main () {
         adc_temp = adc_read(10);
         adc_vcc  = adc_read(12);
         adc_dac0 = adc_read(13);
+        disp_clear_dont_refresh();
+
+/*
+        lcd_gotoxy(0,1);
+        fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
+
+        lcd_gotoxy(0,12);
+        fprintf_P(&LCD,PSTR("DAC:"));
+        lcd_gotoxy(52,12);
+        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(dac_v,2));
+        lcd_gotoxy(90,12);
+        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(dac_i,3));
+
 
         lcd_gotoxy(0,21);
         fprintf_P(&LCD,PSTR("ADC:"));
@@ -180,7 +179,7 @@ int main () {
         }
 
         disp_send_frame();
-
+*/
         lcd_setcontrast(lcd_contrast);
 
         lcd_setbacklight(250-((adc_vin-500)/10));

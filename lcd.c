@@ -153,10 +153,15 @@ static uint8_t lcd_y;
 // Write a char to the current position with a 1 px space afterwards
 int lcd_putc (char c, FILE *stream) {
     uint8_t i;
-    if((c<' ')||(c>127)) return 0;  // We only have charcter between space and 127
+    if((c<' ')||(c>127)) return 0;  // We only have charcters between space and 127
+
     lcd_x += g_draw_char_clearBG(lcd_x, lcd_y, c);
+
+    // Clear a single pixer row after the character
     for (i=0; i<8; i++) disp_set_pixel(lcd_x, lcd_y+i, 0);
     lcd_x++;
+
+    return 1;
 }
 
 // Set the current position
@@ -181,9 +186,6 @@ void lcd_putcxy (unsigned char c,unsigned char x,unsigned char y) {
 void lcd_sendspi (unsigned char c) {
     unsigned char dummy;
 
-    // Wait for the transmit buffer to be empty
-//    while ( !( SPIC.STATUS & SPI_IF_bm) );
-    // 8 bits @ 16Mhz = 0.5 uS
     SPIC.DATA = c;
     while ( !( SPIC.STATUS & SPI_IF_bm) );
     dummy = SPIC.DATA;

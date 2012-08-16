@@ -55,19 +55,29 @@ ISR(TCC0_OVF_vect) {
     }
 }
 
-// Format an integer
-char * ifmt_buf = "abcdefghijk";
+// Format an integer into a floating-point display
+// With fixed decimal point
+// ifmt(12345,2) -> "123.45"
+// ifmt(12345,3) -> "12.345"
+// ifmt(12,2)    -> "0.12"
+#define IFMT_BUFLEN 8
+char ifmt_buf[IFMT_BUFLEN]; // = "abcdefghijk";
 char * util_ifmt(int num, uint8_t dp) {
     uint8_t bp;
-    bp=7;
+
+    // Initialize and start with a \0 at the end of the string
+    bp=IFMT_BUFLEN;
     ifmt_buf[bp--]='\0';
+    // Add the digits after the decimal point
     while(dp--) {
         ifmt_buf[bp--] = (char)0x30+(num%10);
         num = num/10;
     }
+    // Add the decimal point
     ifmt_buf[bp--]='.';
-//    return &ifmt_buf[0];
+    // Add leading zero, if nothing left before the decimal point
     if(!num)ifmt_buf[bp--]='0';
+    // Add the digits in front of the decimal point
     while(num){
         ifmt_buf[bp--] = 0x30+(num%10);
         num = num/10;
@@ -75,8 +85,9 @@ char * util_ifmt(int num, uint8_t dp) {
     return &ifmt_buf[++bp];
 }
 
-uint8_t util_wait_ms (int ms) {
-    uint8_t delay,t;
+// Wait until the next 100ms tick and return the number of ms waited
+int util_wait_ms (int ms) {
+    int delay,t;
     delay = ms-(millisec%ms);
     t=delay;
 //    printf("util_wait_ms: %d ms=%d delay=%d\n",millisec,ms,delay);
