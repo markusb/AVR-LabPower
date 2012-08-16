@@ -48,6 +48,7 @@ void ui_screen_setup();
 void ui_screen_error();
 void ui_screen_memory();
 void ui_screen_message();
+void ui_screen_about();
 
 char ui_msgbuf1[40];
 int ui_msgtimeout;
@@ -63,6 +64,7 @@ void ui_display() {
         case UI_SCN_SETUP:  ui_screen_setup();  break;
         case UI_SCN_MEMORY: ui_screen_memory(); break;
         case UI_SCN_MESSAGE: ui_screen_message(); break;
+        case UI_SCN_ABOUT: ui_screen_about(); break;
         default: ui_screen_error(); break;
     }
     disp_send_frame();
@@ -180,11 +182,10 @@ void ui_screen_setup () {
 
     fprintf_P(&LCD,PSTR("MLP3003: Setup Menu"));
 
-    lcd_gotoxy(8,12);
-    fprintf_P(&LCD,PSTR("Memory"));
-
-    lcd_gotoxy(8,21);
-    fprintf_P(&LCD,PSTR("LCD Contrast: %d"),lcd_contrast);
+    lcd_gotoxy(8,12); fprintf_P(&LCD,PSTR("Memory"));
+    lcd_gotoxy(8,21); fprintf_P(&LCD,PSTR("LCD Contrast: %d"),lcd_contrast);
+    lcd_gotoxy(8,30); fprintf_P(&LCD,PSTR("About"));
+    lcd_gotoxy(8,48); fprintf_P(&LCD,PSTR("Reset"));
 
     lcd_gotoxy(0,12+(ui_menuline*9));
     lcd_putc('>',&LCD);
@@ -203,8 +204,11 @@ void ui_screen_setup () {
             if ((ui_menuline==1)&&(lcd_contrast>10)) lcd_contrast--;
         }
         if (c==BUT_V_SHORT) {
-            if (ui_menuline==0) ui_screen=UI_SCN_MEMORY;
-            else ui_screen=UI_SCN_NORMAL;
+            switch (ui_menuline) {
+                case 0: ui_screen=UI_SCN_MEMORY; break;
+                case 2: ui_screen=UI_SCN_ABOUT; break;
+                default: ui_screen=UI_SCN_NORMAL;
+            }
         }
         if (c==BUT_I) {
             ui_screen=UI_SCN_NORMAL;
@@ -293,5 +297,33 @@ void ui_screen_message () {
         ui_msgtimeout=0;
     }
     if ((util_sec>=ui_msgsec)&&(util_ms>=ui_msgms)) ui_screen=UI_SCN_NORMAL;
+}
+
+void ui_screen_about () {
+    uint8_t c;
+//    printf("ui_screen_about:\n");
+
+    fprintf_P(&LCD,PSTR("MLP3003: About Screen"));
+    util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, ADCACAL0) );
+    lcd_gotoxy(0,12); fprintf_P(&LCD,PSTR("Firmware Version: %s"),FWVERSION);
+    lcd_gotoxy(0,21); fprintf_P(&LCD,PSTR("Build Number: %s"),build);
+    lcd_gotoxy(0,30); fprintf_P(&LCD,PSTR("Ser: %x:%x:%x:%x:%x:%x-%x"),
+            util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, LOTNUM0)),
+            util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, LOTNUM1)),
+            util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, LOTNUM2)),
+            util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, LOTNUM3)),
+            util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, LOTNUM4)),
+            util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, LOTNUM5)),
+            util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, WAFNUM))
+        );
+    lcd_gotoxy(0,39); fprintf_P(&LCD,PSTR("By Markus B{rtschi"));
+    lcd_gotoxy(0,48); fprintf_P(&LCD,PSTR("markus@markus.org"));
+
+    while ((c=sw_read())) {
+        if (c==BUT_V_SHORT) { // Recall
+            ui_screen=UI_SCN_NORMAL;
+            ui_msgtimeout = 0;
+        }
+    }
 }
 
