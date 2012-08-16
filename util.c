@@ -13,9 +13,10 @@
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include "lcd.h"
+//#include "util.h"
 
-volatile int millisec;
-volatile int seconds;
+volatile int util_ms;
+volatile int util_sec;
 
 /*
     Set clock to internal 32Mhz clock
@@ -44,22 +45,26 @@ uint8_t util_read_calib_byte( uint8_t index ) {
 }
 
 /*
-* Interrupt on TCC0 overflow = interrupt every ms
+// Interrupt on TCC0 overflow = interrupt every ms
 */
 ISR(TCC0_OVF_vect) {
-//    PORTC.OUTTGL = PIN6_bm;
-    millisec++;
-    if (millisec>=1000) {
-        millisec=0;
-        seconds++;
+    PORTC.OUTTGL = PIN6_bm;
+    cli();
+    util_ms++;
+    if (util_ms>=1000) {
+        util_ms=0;
+        util_sec++;
     }
+    sei();
 }
 
+/*
 // Format an integer into a floating-point display
 // With fixed decimal point
 // ifmt(12345,2) -> "123.45"
 // ifmt(12345,3) -> "12.345"
 // ifmt(12,2)    -> "0.12"
+*/
 #define IFMT_BUFLEN 8
 char ifmt_buf[IFMT_BUFLEN]; // = "abcdefghijk";
 char * util_ifmt(int num, uint8_t dp) {
@@ -88,11 +93,11 @@ char * util_ifmt(int num, uint8_t dp) {
 // Wait until the next 100ms tick and return the number of ms waited
 int util_wait_ms (int ms) {
     int delay,t;
-    delay = ms-(millisec%ms);
+    delay = ms-(util_ms%ms);
     t=delay;
-//    printf("util_wait_ms: %d ms=%d delay=%d\n",millisec,ms,delay);
+//    printf("util_wait_ms: %d ms=%d delay=%d\n",util_ms,ms,delay);
     while (delay--) _delay_ms(1);
-//    while ((millisec%ms)>0);
+//    while ((util_ms%ms)>0);
     return t;
 }
 
@@ -111,6 +116,8 @@ void util_init () {
 //    TCC0_INTCTRLB = TC1_CCBINTLVL0_bm;
 
     PORTC.DIRSET = PIN6_bm;
+    PORTB.DIRSET = PIN1_bm;
+    PORTB.OUTSET = PIN1_bm;
 }
 
 void util_ledonoff (unsigned char s) {

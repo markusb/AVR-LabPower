@@ -25,8 +25,6 @@
 //extern uint8_t rotbwptr;
 //extern uint8_t rotbrptr;
 
-extern int seconds;
-extern int millisec;
 extern char *build;
 
 extern uint8_t lcd_contrast;
@@ -44,11 +42,11 @@ volatile int adc_vcc;
 
 int main () {
     int count = 0;
-    unsigned char c,d;
-    int t;
+//    unsigned char c,d;
+    int t = 0;
 
-    int tempref = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE0)) +
-                  util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE1)) * 256;
+//    int tempref = util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE0)) +
+//                  util_read_calib_byte( offsetof(NVM_PROD_SIGNATURES_t, TEMPSENSE1)) * 256;
 
     uart_init();
     stdout = &mystdout;
@@ -76,8 +74,9 @@ int main () {
         } else if (count>9) {
             util_ledonoff(150);
         }
-        t=util_wait_ms(100);
-        if (count==0) printf("[%04d:%03d %d] \n",seconds,millisec,t );
+//        _delay_ms(3);
+//        t=util_wait_ms(100);
+        if (count==0) printf("[%04d:%03d %d] \n",util_sec,util_ms,t);
 
         adc_vmeter = adc_read(1);
         adc_vin = adc_read(4);
@@ -90,99 +89,9 @@ int main () {
 
         ui_display();
 
-/*
-        lcd_gotoxy(0,1);
-        fprintf_P(&LCD,PSTR("MLP3003 V%s %s "),FWVERSION,build);
-
-        lcd_gotoxy(0,12);
-        fprintf_P(&LCD,PSTR("DAC:"));
-        lcd_gotoxy(52,12);
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(dac_v,2));
-        lcd_gotoxy(90,12);
-        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(dac_i,3));
-
-
-        lcd_gotoxy(0,21);
-        fprintf_P(&LCD,PSTR("ADC:"));
-        lcd_gotoxy(52,21);
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vout,2));
-        lcd_gotoxy(90,21);
-        fprintf_P(&LCD,PSTR("%sA"),util_ifmt(adc_iout,3));
-
-        lcd_gotoxy(0,30);
-        fprintf_P(&LCD,PSTR("Meter:"));
-        lcd_gotoxy(52,30);
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vmeter-(adc_vmeter/11)-(adc_vmeter/45),2));
-
-        lcd_gotoxy(0,39);
-        fprintf_P(&LCD,PSTR("Vin:"));
-        lcd_gotoxy(52,39);
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vin,2));
-        lcd_gotoxy(90,39);
-        fprintf_P(&LCD,PSTR("%sAuc"),util_ifmt(adc_iuc,2));
-
-        lcd_gotoxy(0,48);
-        fprintf_P(&LCD,PSTR("Vcc:"));
-        lcd_gotoxy(52,48);
-
-        fprintf_P(&LCD,PSTR("%sV"),util_ifmt(adc_vcc>>2,2));
-        lcd_gotoxy(90,48);
-        fprintf_P(&LCD,PSTR("%sT"),util_ifmt(adc_temp,2));
-
-        while ((c=sw_read())) {
-            if (c==ROT_V_CW) {
-                dac_v += rot_decade;
-                if (dac_v>4000) dac_v = 4000;
-                dac_set(0,dac_v);
-                printf("main: set_dac(0,%d)\n",dac_v);
-            }
-            if (c==ROT_V_CCW) {
-                dac_v -= rot_decade;
-                if (dac_v<0) dac_v = 0;
-                dac_set(0,dac_v);
-                printf("main: set_dac(0,%d)\n",dac_v);
-            }
-            if (c==ROT_I_CW) {
-//                lcd_contrast++;
-                dac_i += rot_decade;
-                if (dac_i>4000) dac_i = 4000;
-                dac_set(1,dac_i);
-                printf("main: set_dac(1,%d)\n",dac_i);
-            }
-            if (c==ROT_I_CCW) {
-//                lcd_contrast--;
-                dac_i -= rot_decade;
-                if (dac_i<0) dac_i = 0;
-                dac_set(1,dac_i);
-                printf("main: set_dac(1,%d)\n",dac_i);
-            }
-            if (c==BUT_V) {
-                switch (rot_decade) {
-                    case 1: rot_decade = 10; break;
-                    case 10: rot_decade = 100; break;
-                    case 100: rot_decade = 1; break;
-                    default: rot_decade = 1; break;
-                }
-                printf("main: rot_decade=%d\n",rot_decade);
-            }
-            if (c==BUT_I) {
-                printf("main: but_i\n");
-            }
-            if (c==BUT_S1) {
-                printf("main: but_s1\n");
-            }
-            if (c==BUT_S2) {
-                printf("main: but_s2\n");
-            }
-            if (c==BUT_S3) {
-                printf("main: but_s3\n");
-            }
-        }
-
-        disp_send_frame();
-*/
         lcd_setcontrast(lcd_contrast);
 
+        // Set the LCD backlight brightness according to the input voltage
         lcd_setbacklight(250-((adc_vin-500)/10));
     }
 }

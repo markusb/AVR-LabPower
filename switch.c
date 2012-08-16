@@ -7,14 +7,16 @@
  *
  */
 
+#include <stdio.h>
+#include <stddef.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <stddef.h>
 #include "switch.h"
 #include "rotary.h"
+#include "util.h"
 
-extern int seconds;
-extern int millisec;
+//extern int util_sec;
+//extern int util_ms;
 
 int but_sec;
 int but_ms;
@@ -99,20 +101,22 @@ uint8_t sw_read () {
 //   	else if (!(PORTB.IN & BUT_S2_PIN)) { c=BUT_S2; }
 //   	else if (!(PORTB.IN & BUT_S3_PIN)) { c=BUT_S3; }
    	else { c=0; }
-//   	printf("sw_read: c=%d lastc=%d\n",c,lastc);
 
+    // Detects the release of a button
     if ((c==0)&&(lastc>0)) {    // Button released
-        bdelta=(seconds-but_sec)*1000+(millisec-but_ms);
-        c=c+BUT_SHORT;
+        bdelta=(util_sec-but_sec); //*1000+(util_ms-but_ms);
         printf("sw_read: button %x released delta=%d\n",lastc,bdelta);
+        c=c+BUT_SHORT;
+        lastc=0;
+        return c;
     }
 
    	if (c==lastc) return 0;
    	lastc = c;
     printf("sw_read: button %x pressed\n",c);
 
-    but_sec = seconds;
-    but_ms = millisec;
+    but_sec = util_sec;
+    but_ms = util_ms;
 
    	return c;
 }
